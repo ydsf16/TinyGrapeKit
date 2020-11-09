@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.8)
-project(TinyGrape)
+project(TinyGrapeKit)
 
 # Set C++14
 add_compile_options(-std=c++14)
@@ -15,6 +15,7 @@ include_directories(${GLOG_INCLUDE_DIR})
 find_package(OpenCV 3 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS}/opencv4)
 
+include_directories(include)
 # Make library
 file(GLOB_RECURSE ALL_HEADER_FILES
     ${PROJECT_SOURCE_DIR}/include/*.h
@@ -22,7 +23,18 @@ file(GLOB_RECURSE ALL_HEADER_FILES
 file(GLOB_RECURSE ALL_SRC_FILES
     ${PROJECT_SOURCE_DIR}/src/*.cpp
 )
-include_directories(include)
 
-add_library(${PROJECT_NAME} SHARED ${ALL_SRC_FILES} ${ALL_HEADER_FILES})
+add_library(${PROJECT_NAME} SHARED ${ALL_SRC_FILES})
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+
+# install
+set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install)
+install(TARGETS ${PROJECT_NAME}
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+)
+
+install(
+    DIRECTORY include/
+    DESTINATION include/TGK
+)

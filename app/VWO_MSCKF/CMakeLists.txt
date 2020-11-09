@@ -15,6 +15,11 @@ include_directories(${GLOG_INCLUDE_DIR})
 find_package(OpenCV 3 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS}/opencv4)
 
+# TinyGrapeKit library
+set(TGK_DIR ${CMAKE_SOURCE_DIR}/../../library/install)
+include_directories(${TGK_DIR}/include)
+link_directories(${TGK_DIR}/lib)
+
 # Make library
 file(GLOB_RECURSE ALL_HEADER_FILES
     ${PROJECT_SOURCE_DIR}/include/*.h
@@ -29,4 +34,4 @@ include_directories(include)
 
 ## Declare C++ executables
 add_executable(RunKAISTData example/RunKAISTData.cpp)
-target_link_libraries(RunKAISTData glog ${OpenCV_LIBS})
+target_link_libraries(RunKAISTData glog ${OpenCV_LIBS} TinyGrapeKit)
