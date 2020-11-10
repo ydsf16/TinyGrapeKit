@@ -14,7 +14,6 @@ void FeatureTracker::TrackImage(const cv::Mat& image,
                                 std::vector<long int>* tracked_pt_ids,
                                 std::vector<long int>* lost_pt_ids,
                                 std::set<long int>* new_pt_ids) {
-    
     tracked_pts->clear();
     tracked_pt_ids->clear();
     if (lost_pt_ids != nullptr) { lost_pt_ids->clear(); }
@@ -91,6 +90,14 @@ void FeatureTracker::CreateMask(const int width, const int heigth,
         cv::circle(*mask, cv::Point2i(pt[0], pt[1]), config_.min_dist, 0, -1);
     }
 } 
+
+void FeatureTracker::DeleteFeature(const long int pt_id) {
+    const auto iter = std::find(last_pt_ids_.begin(), last_pt_ids_.end(), pt_id);
+    if (iter == last_pt_ids_.end()) { return; }
+    int idx = std::distance(last_pt_ids_.begin(), iter);
+    last_pt_ids_.erase(iter);
+    last_cv_pts_.erase(last_cv_pts_.begin() + idx);
+}
 
 }  // namespace ImageProcessor
 }  // namespace TGK

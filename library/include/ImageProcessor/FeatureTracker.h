@@ -24,6 +24,8 @@ public:
                     std::vector<long int>* lost_pt_ids = nullptr,
                     std::set<long int>* new_pt_ids = nullptr);
 
+    void DeleteFeature(const long int pt_id);
+    
 private:
     void CreateMask(const int width, const int heigth, const std::vector<Eigen::Vector2d>& points, cv::Mat* mask);
 
