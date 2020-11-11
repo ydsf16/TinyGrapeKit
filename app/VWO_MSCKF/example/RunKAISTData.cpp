@@ -32,7 +32,10 @@ int main(int argc, char** argv) {
         LOG(ERROR) << "[main]: Please input config_file, data_folder.";
         return EXIT_FAILURE;
     }
-    
+
+    FLAGS_minloglevel = 0;
+    FLAGS_colorlogtostderr = true;
+
     const std::string config_file = argv[1];
     const std::string data_folder = argv[2];
 
@@ -64,13 +67,17 @@ int main(int argc, char** argv) {
         const std::string& sensor_type = line_data_vec[1];
         if (sensor_type == "stereo") {
             const std::string img_file = data_folder + "/image/stereo_left/" + time_str + ".png";
-            const cv::Mat image = cv::imread(img_file, cv::IMREAD_GRAYSCALE);
-            if (image.empty()) {
+            const cv::Mat raw_image = cv::imread(img_file, CV_LOAD_IMAGE_ANYDEPTH);
+            if (raw_image.empty()) {
                 LOG(ERROR) << "[main]: Failed to open image at time: " << time_str;
                 return EXIT_FAILURE;
             }
             
-            // TODO: Send image to system.
+            // Convert raw image to gray image.
+            cv::Mat gray_img;
+            cv::cvtColor(raw_image, gray_img, cv::COLOR_BayerRG2GRAY);
+            
+
         }
 
         if (sensor_type == "encoder") {

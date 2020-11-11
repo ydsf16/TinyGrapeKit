@@ -18,6 +18,7 @@ include_directories(${OpenCV_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS}/opencv4)
 # TinyGrapeKit library
 set(TGK_DIR ${CMAKE_SOURCE_DIR}/../../library/install)
 include_directories(${TGK_DIR}/include)
+include_directories(${TGK_DIR}/include/TGK)
 link_directories(${TGK_DIR}/lib)
 
 # Make library
@@ -29,9 +30,9 @@ file(GLOB_RECURSE ALL_SRC_FILES
 )
 include_directories(include)
 
-#add_library(${PROJECT_NAME} SHARED ${ALL_SRC_FILES} ${ALL_HEADER_FILES})
-#target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+add_library(${PROJECT_NAME} SHARED ${ALL_SRC_FILES} ${ALL_HEADER_FILES})
+target_link_libraries(${PROJECT_NAME} TinyGrapeKit)
 
 ## Declare C++ executables
 add_executable(RunKAISTData example/RunKAISTData.cpp)
-target_link_libraries(RunKAISTData glog ${OpenCV_LIBS} TinyGrapeKit)
+target_link_libraries(RunKAISTData glog ${OpenCV_LIBS} TinyGrapeKit ${PROJECT_NAME})
