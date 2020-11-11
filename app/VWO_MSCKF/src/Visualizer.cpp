@@ -1,8 +1,13 @@
-#include "VWO/Visualizer.h"
+#include <VWO/Visualizer.h>
+
+#include <pangolin/pangolin.h>
 
 namespace VWO {
 
-Visualizer::Visualizer(const Config& config) : config_(config) { }
+Visualizer::Visualizer(const Config& config) : config_(config) { 
+    // Start viz_thread.
+    viz_thread_ = std::make_shared<std::thread>(&Visualizer::Run, this);
+}
 
 void Visualizer::DrawCameras(const std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>>& camera_poses) {
     std::lock_guard<std::mutex> lg(data_buffer_mutex_);
@@ -23,10 +28,202 @@ void Visualizer::DrawFeatures(const std::vector<Eigen::Vector3d>& features) {
     while (features_.size() > config_.max_num_features) { features_.pop_front(); } 
 }
 
-void Visualizer::Run() {
-    // Config panglin.
-    
+void Visualizer::DrawImage(const cv::Mat& image) {
+    std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+    image_ = image;
+    cv::resize(image, image_, cv::Size(config_.img_width, config_.img_heigh));
+    cv::flip(image_, image_, 0);
+}
 
+pangolin::OpenGlMatrix SE3ToOpenGlMat(const Eigen::Matrix3d& G_R_C, const Eigen::Vector3d& G_p_C) {
+    pangolin::OpenGlMatrix p_mat;
+    
+    p_mat.m[0] = G_R_C(0, 0);
+    p_mat.m[1] = G_R_C(1, 0);
+    p_mat.m[2] = G_R_C(2, 0);
+    p_mat.m[3] = 0.;
+
+    p_mat.m[4] = G_R_C(0, 1);
+    p_mat.m[5] = G_R_C(1, 1);
+    p_mat.m[6] = G_R_C(2, 1);
+    p_mat.m[7] = 0.;
+
+    p_mat.m[8] = G_R_C(0, 2);
+    p_mat.m[9] = G_R_C(1, 2);
+    p_mat.m[10] = G_R_C(2, 2);
+    p_mat.m[11] = 0.;
+
+    p_mat.m[12] = G_p_C(0);
+    p_mat.m[13] = G_p_C(1);
+    p_mat.m[14] = G_p_C(2);
+    p_mat.m[15] = 1.;
+
+    return p_mat;
+}
+
+void Visualizer::DrawOneCamera(const Eigen::Matrix3d& G_R_C, const Eigen::Vector3d& G_p_C) {
+    const float w = config_.cam_size;
+    const float h = w * 0.75;
+    const float z = w * 0.6;
+
+    pangolin::OpenGlMatrix G_T_C = SE3ToOpenGlMat(G_R_C, G_p_C);
+
+    glPushMatrix();
+
+#ifdef HAVE_GLES
+    glMultMatrixf(G_T_C.m);
+#else
+    glMultMatrixd(G_T_C.m);
+#endif
+
+    glLineWidth(config_.cam_line_width);
+    glBegin(GL_LINES);
+    glVertex3f(0, 0, 0);
+    glVertex3f(w, h, z);
+    glVertex3f(0, 0, 0);
+    glVertex3f(w, -h, z);
+    glVertex3f(0, 0, 0);
+    glVertex3f(-w, -h, z);
+    glVertex3f(0, 0, 0);
+    glVertex3f(-w, h, z);
+
+    glVertex3f(w, h, z);
+    glVertex3f(w, -h, z);
+
+    glVertex3f(-w, h, z);
+    glVertex3f(-w, -h, z);
+
+    glVertex3f(-w, h, z);
+    glVertex3f(w, h, z);
+
+    glVertex3f(-w, -h, z);
+    glVertex3f(w, -h, z);
+    glEnd();
+
+    glPopMatrix();
+}
+
+void Visualizer::DrawCameras() {
+    std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+    for (const std::pair<Eigen::Matrix3d, Eigen::Vector3d>& cam : camera_poses_) {
+        DrawOneCamera(cam.first, cam.second);
+    }
+}
+
+void Visualizer::DrawTraj() {
+    glLineWidth(config_.cam_line_width);
+    glBegin(GL_LINE_STRIP);
+
+    std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+    for (const auto& wheel_pose : wheel_traj_) {
+        const Eigen::Vector3d& G_p_O = wheel_pose.second;
+        glVertex3f(G_p_O[0], G_p_O[1], G_p_O[2]);
+    }
+
+    glEnd();
+}
+
+void Visualizer::DrawFeatures() {
+    glPointSize(config_.point_size);
+    glBegin(GL_POINTS);
+
+    std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+    for (const Eigen::Vector3d& pt : features_) {
+        glVertex3f(pt[0], pt[1], pt[2]);
+    }
+
+    glEnd();
+}
+
+void Visualizer::DrawWheeFrame(const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O) {
+    pangolin::OpenGlMatrix G_T_O = SE3ToOpenGlMat(G_R_O, G_p_O); 
+    pangolin::glDrawAxis(G_T_O, config_.wheel_frame_size);
+}
+
+void Visualizer::DrawWheeFrame() {
+    std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+    if (wheel_traj_.empty()) { return; }
+    DrawWheeFrame(wheel_traj_.back().first, wheel_traj_.back().second);
+}
+
+void Visualizer::Run() {
+    pangolin::CreateWindowAndBind("TinyGrapeKit-VWO-MSCKF", 1920, 1080);
+    glEnable(GL_DEPTH_TEST);
+
+    // Issue specific OpenGl we might need
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Menu.
+    pangolin::CreatePanel("menu").SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(175));
+
+    pangolin::Var<bool> menu_follow_cam("menu.Follow Camera", true, true);
+    pangolin::Var<int> grid_scale("menu.Grid Size (m)", 100, 1, 500);
+    pangolin::Var<bool> draw_grid("menu.Draw Grid", true, true);
+
+    // Define Camera Render Object (for view / scene browsing)
+    pangolin::OpenGlRenderState s_cam(
+        pangolin::ProjectionMatrix(1920, 1080, config_.view_point_f, config_.view_point_f, 960, 540, 0.1, 10000),
+        pangolin::ModelViewLookAt(config_.view_point_x, config_.view_point_y, config_.view_point_z, 0, 0, 0, 1, 0, 0));
+                      
+    // Add named OpenGL viewport to window and provide 3D Handler
+    pangolin::View& d_cam = pangolin::CreateDisplay()
+        .SetBounds(0.0, 1.0, pangolin::Attach::Pix(175), 1.0, -1920.0f/1080.0f)
+        .SetHandler(new pangolin::Handler3D(s_cam));
+
+    // Draw image.
+    pangolin::View& d_image = pangolin::Display("image")
+      .SetBounds(0.8f, 1.0f, 0.1, 1./3, config_.img_width / config_.img_heigh)
+      .SetLock(pangolin::LockLeft, pangolin::LockTop);
+    pangolin::GlTexture image_texture(config_.img_width, config_.img_heigh, GL_RGB, true, 0, GL_RGB, GL_UNSIGNED_BYTE);
+
+    pangolin::OpenGlMatrix G_T_C;
+    G_T_C.SetIdentity();
+
+    while (true) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        d_cam.Activate(s_cam);
+        glClearColor(0.0f, 0.0f, 0.0f,1.0f);
+        {
+            std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+            if(menu_follow_cam && !camera_poses_.empty()){
+                G_T_C = SE3ToOpenGlMat(camera_poses_.back().first, camera_poses_.back().second);
+                s_cam.Follow(G_T_C);
+            }
+        }
+
+        // Draw grid.
+        if (draw_grid) {
+            glColor3f(0.3f, 0.3f, 0.3f);
+            pangolin::glDraw_z0(grid_scale, 1000);
+        }
+
+        // Draw wheel traj.
+        glColor3f(1.0f, 0.0f, 0.0f);
+        DrawTraj();
+        DrawWheeFrame();
+
+        // Draw camera poses.
+        glColor3f(0.0f, 1.0f, 0.0f);
+        DrawCameras();
+
+        // Draw map points.
+        glColor3f(0.0f, 0.0f, 1.0f);
+        DrawFeatures();
+
+        // Draw image
+        {
+            std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+            if (!image_.empty()) {
+                image_texture.Upload(image_.data, GL_RGB, GL_UNSIGNED_BYTE);
+                d_image.Activate();
+                glColor3f(1.0, 1.0, 1.0);
+                image_texture.RenderToViewport();
+            }
+        }
+        pangolin::FinishFrame();
+    }
 }
 
 }  // namespace VWO

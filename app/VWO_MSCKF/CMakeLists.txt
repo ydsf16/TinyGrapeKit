@@ -21,6 +21,11 @@ include_directories(${TGK_DIR}/include)
 include_directories(${TGK_DIR}/include/TGK)
 link_directories(${TGK_DIR}/lib)
 
+# Pangolin
+set(Pangolin_DIR ${CMAKE_SOURCE_DIR}/../../../third_party/Pangolin)
+include_directories(${Pangolin_DIR}/include)
+link_directories(${Pangolin_DIR}/include/build/src)
+
 # Make library
 file(GLOB_RECURSE ALL_HEADER_FILES
     ${PROJECT_SOURCE_DIR}/include/*.h
@@ -31,7 +36,7 @@ file(GLOB_RECURSE ALL_SRC_FILES
 include_directories(include)
 
 add_library(${PROJECT_NAME} SHARED ${ALL_SRC_FILES} ${ALL_HEADER_FILES})
-target_link_libraries(${PROJECT_NAME} TinyGrapeKit)
+target_link_libraries(${PROJECT_NAME} TinyGrapeKit pangolin)
 
 ## Declare C++ executables
 add_executable(RunKAISTData example/RunKAISTData.cpp)
