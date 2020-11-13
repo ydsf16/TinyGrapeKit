@@ -2,6 +2,8 @@
 
 #include <Eigen/Core>
 
+#include <VWO/Visualizer.h>
+
 namespace VWO {
 
 struct CamParam {
@@ -33,6 +35,8 @@ struct Parameter {
     WheelParam wheel_param;
     // Extrinsic.
     ExtrinsicParam extrinsic;
+
+    Visualizer::Config viz_config;
 };
 
 }  // namespace VWO
