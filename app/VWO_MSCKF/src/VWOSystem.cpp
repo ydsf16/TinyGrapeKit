@@ -2,15 +2,20 @@
 
 #include <glog/logging.h>
 
+#include <VWO/ParamLoader.h>
+
 namespace VWO {
 
 VWOSystem::VWOSystem(const std::string& param_file) : initialized_(false) {
-    // TODO: Load parameters.
+    /// Load parameters.
+    LoadParam(param_file, &param_);
 
-    /// 2. Initialize all modules.
+    /// Initialize all modules.
     data_sync_ = std::make_unique<TGK::DataSynchronizer::WheelImageSynchronizer>();
+
     initializer_ = std::make_unique<Initializer>(param_.extrinsic.O_R_C, param_.extrinsic.O_p_C, 
         param_.wheel_param.kl, param_.wheel_param.kr, param_.wheel_param.b);
+        
     viz_ = std::make_unique<Visualizer>(param_.viz_config);
 }
 

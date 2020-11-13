@@ -8,6 +8,7 @@ namespace VWO {
 
 struct CamParam {
     double fx;
+    double s;
     double fy;
     double cx;
     double cy;
@@ -15,12 +16,15 @@ struct CamParam {
     double k2;
     double p1;
     double p2;
+    double k3;
 };
 
 struct WheelParam {
     double kl;
     double kr;
     double b;
+    
+    double noise_factor;
 };
 
 struct ExtrinsicParam {
