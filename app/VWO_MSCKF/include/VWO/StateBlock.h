@@ -1,0 +1,60 @@
+#pragma once
+
+#include <Eigen/Geometry>
+
+namespace VWO {
+
+inline void UpdateSE3(const Eigen::Matrix<double, 6, 1>& delta_x, Eigen::Matrix3d* R, Eigen::Vector3d* p) {
+    // Update Rotation.
+    const double delta_angle = delta_x.segment<3>(0).norm();
+    Eigen::Matrix3d delta_R = Eigen::Matrix3d::Identity();
+    if (std::abs(delta_angle) > 1e-12) {
+        delta_R = Eigen::AngleAxisd(delta_angle, delta_x.segment<3>(0).normalized());
+    }
+    *R = R->eval() * delta_R;
+
+    // Update position.
+    *p += delta_x.segment<3>(3);
+}
+
+struct StateBlock {
+    // Global ID.
+    long int id = -1;
+    // Error state size.
+    int size = 0;
+    // Index in state vector/covariance.
+    int state_idx = 0;    
+};
+
+struct WheelPose : public StateBlock {
+    Eigen::Matrix3d G_R_O;
+    Eigen::Vector3d G_p_O;
+
+    void Update(const Eigen::Matrix<double, 6, 1>& delta_x) {
+        UpdateSE3(delta_x, &G_R_O, &G_p_O);
+    }
+};
+
+struct CameraFrame : public StateBlock {
+    // SE3 of this frame.
+    Eigen::Matrix3d G_R_C;
+    Eigen::Vector3d G_p_C;
+    // Features in this frame.
+    std::vector<Eigen::Vector2d> im_fts;
+    std::vector<long int> ft_ids;
+
+    void Update(const Eigen::Matrix<double, 6, 1>& delta_x) {
+        UpdateSE3(delta_x, &G_R_C, &G_p_C);
+    }
+};
+
+struct Extrinsic : public StateBlock {
+    Eigen::Matrix3d O_R_C;
+    Eigen::Vector3d O_p_C;
+
+    void Update(const Eigen::Matrix<double, 6, 1>& delta_x) {
+        UpdateSE3(delta_x, &O_R_C, &O_p_C);
+    }
+};
+
+}  // namespace VWO
