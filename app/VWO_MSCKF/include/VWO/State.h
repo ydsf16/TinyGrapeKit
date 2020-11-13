@@ -9,6 +9,8 @@ namespace VWO {
 struct State {
     double timestamp;
 
+    // Wheel Instrinsic.
+    WheelIntrinsic wheel_intrinsic_;
     // Extrinsic.
     Extrinsic extrinsic_;
     // The current wheel pose.
@@ -21,11 +23,11 @@ struct State {
 
     void Update(const Eigen::VectorXd& delta_x) {
         // Update Wheel_pose.
-        wheel_pose_.Update(delta_x.segment<6>(wheel_pose_.state_idx));
+        wheel_pose_.Update(delta_x.segment(wheel_pose_.state_idx, wheel_pose_.size));
 
         // Update Camera pose.
         for (CameraFrame& cam_fm : camera_frame_) {
-            cam_fm.Update(delta_x.segment<6>(cam_fm.state_idx));
+            cam_fm.Update(delta_x.segment(cam_fm.state_idx, cam_fm.size));
         }
     }
 };

@@ -7,6 +7,11 @@
 #include <opencv2/opencv.hpp>
 
 #include <TGK/Camera/Camera.h>
+#include <TGK/DataSynchronizer/WheelImageSynchronizer.h>
+
+#include <VWO/Initializer.h>
+#include <VWO/Parameter.h>
+#include <VWO/State.h>
 
 namespace VWO {
 
@@ -14,7 +19,7 @@ class VWOSystem {
 public:
     VWOSystem(const std::string& param_file);
 
-    bool FeedIMU(const double timestamp, const Eigen::Vector3d& acc, const Eigen::Vector3d& gyro);
+    bool FeedIMU(const double timestamp, const double left, const double right);
 
     bool FeedImage(const double timestamp, const cv::Mat& image);
 
@@ -24,6 +29,13 @@ public:
 
 private:
     std::shared_ptr<TGK::Camera::Camera> camera_;
+    std::unique_ptr<TGK::DataSynchronizer::WheelImageSynchronizer> data_sync_;
+    std::unique_ptr<Initializer> initializer_;
+
+    bool initialized_;
+    Parameter param_;
+
+    State state_;
 };
 
 }  // namespace VWO

@@ -27,6 +27,8 @@ struct StateBlock {
 };
 
 struct WheelPose : public StateBlock {
+    WheelPose() { size = 6; }
+
     Eigen::Matrix3d G_R_O;
     Eigen::Vector3d G_p_O;
 
@@ -36,6 +38,10 @@ struct WheelPose : public StateBlock {
 };
 
 struct CameraFrame : public StateBlock {
+    CameraFrame() { size = 6; }
+
+    double timestamp;
+
     // SE3 of this frame.
     Eigen::Matrix3d G_R_C;
     Eigen::Vector3d G_p_C;
@@ -49,11 +55,27 @@ struct CameraFrame : public StateBlock {
 };
 
 struct Extrinsic : public StateBlock {
+    Extrinsic() { size = 6; }
+
     Eigen::Matrix3d O_R_C;
     Eigen::Vector3d O_p_C;
 
     void Update(const Eigen::Matrix<double, 6, 1>& delta_x) {
         UpdateSE3(delta_x, &O_R_C, &O_p_C);
+    }
+};
+
+struct WheelIntrinsic : public StateBlock {
+    WheelIntrinsic() { size = 3; }
+
+    double kl;
+    double kr;
+    double b;
+
+    void Update(const Eigen::Vector3d& delta_x) {
+        kl += delta_x[0];
+        kr += delta_x[1];
+        b  += delta_x[2];
     }
 };
 
