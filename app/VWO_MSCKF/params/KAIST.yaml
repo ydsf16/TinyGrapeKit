@@ -1,0 +1,38 @@
+%YAML:1.0
+
+# Camera intrinsic
+Camera.fx: 8.1640221474060002e+02
+Camera.fy: 8.1738388562809996e+02
+camera.s:  -2.3882017757999998e+00
+Camera.cx: 6.0882658427579997e+02
+Camera.cy: 2.6668865652440002e+02
+
+Camera.k1: -5.0040485799999999e-02
+Camera.k2: 1.2001217170000000e-01
+Camera.p1: -6.2598060000000004e-04
+Camera.p2: -1.1825064000000000e-03
+Camera.k3: -6.3505207999999994e-02
+
+Camera.width: 1280
+Camera.height: 560
+
+# Wheel intrinsic
+Wheel.kl: 0.00047820240382508
+Wheel.kr: 0.00047768621928995
+Wheel.b: 1.52439
+Wheel.noise_factor: 0.02
+
+# Extrinsic
+Extrinsic.O_R_C: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ -0.00680499, -0.0153215, 0.99985, 
+           -0.999977, 0.000334627, -0.00680066,
+           -0.000230383, -0.999883, -0.0153234 ]
+
+Extrinsic.O_p_C: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [ 1.64239, 0.247401, 1.58411 ]
