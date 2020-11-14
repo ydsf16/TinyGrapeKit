@@ -42,9 +42,11 @@ void WheelPropagator::PropagateUsingEncoder(const double begin_wl, const double 
         J_wrt_lr_dist << Eigen::Vector3d(0., 0., -1. / b_),         Eigen::Vector3d(0., 0., 1. / b_),
                          old_G_R_O * Eigen::Vector3d(0.5, 0., 0.), old_G_R_O * Eigen::Vector3d(0.5, 0., 0.);
         
+        const double left_noise_std = left_dist * noise_factor_;
+        const double right_noise_std = right_dist * noise_factor_;
         const Eigen::Matrix2d dist_noise = 
-            (Eigen::Matrix2d() << left_dist * noise_factor_, 0., 
-                                  0.,                        right_dist * noise_factor_).finished();
+            (Eigen::Matrix2d() << left_noise_std * left_noise_std, 0., 
+                                  0.,                              right_noise_std * right_noise_std).finished();
 
         *cov = (*J_wrt_pose) * cov->eval() * J_wrt_pose->transpose() + 
                J_wrt_lr_dist * dist_noise * J_wrt_lr_dist.transpose();
