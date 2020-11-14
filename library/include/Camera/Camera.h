@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <Eigen/Core>
 
 namespace TGK {
@@ -32,6 +34,8 @@ protected:
     int width_;
     int height_;
 };
+
+using CameraPtr = std::shared_ptr<Camera>;
 
 }  // namespace Camera
 }  // namespace TGK
