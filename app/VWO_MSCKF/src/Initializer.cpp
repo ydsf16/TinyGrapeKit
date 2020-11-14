@@ -21,7 +21,7 @@ void Initializer::Initialize(const double timestamp, State* init_state) {
     // Set initial wheel pose to ZERO.
     int state_idx = 0;
     init_state->wheel_pose_.G_R_O.setIdentity();
-    init_state->wheel_pose_.G_p_O.setIdentity();
+    init_state->wheel_pose_.G_p_O.setZero();
     init_state->wheel_pose_.state_idx = state_idx;
 
     // Clear camera frame.

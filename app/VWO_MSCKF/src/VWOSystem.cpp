@@ -1,5 +1,6 @@
 #include <VWO/VWOSystem.h>
 
+#include <assert.h>
 #include <glog/logging.h>
 
 #include <VWO/ParamLoader.h>
@@ -15,7 +16,10 @@ VWOSystem::VWOSystem(const std::string& param_file) : initialized_(false) {
 
     initializer_ = std::make_unique<Initializer>(param_.extrinsic.O_R_C, param_.extrinsic.O_p_C, 
         param_.wheel_param.kl, param_.wheel_param.kr, param_.wheel_param.b);
-        
+
+    propagator_ = std::make_unique<Propagator>(param_.wheel_param.kl, param_.wheel_param.kr, param_.wheel_param.b, 
+                                               param_.wheel_param.noise_factor);
+
     viz_ = std::make_unique<Visualizer>(param_.viz_config);
 }
 
@@ -35,10 +39,26 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
 
     // Initialize.
     if (!initialized_) {
-        initializer_->Initialize(timestamp, &state_);
+        initializer_->Initialize(img_ptr->timestamp, &state_);
+        initialized_ = true;
+        return true;
     }
 
     // Propagate state.
+    for (size_t i = 1; i < wheel_data_segment.size(); ++i) {
+        const auto begin_wheel = wheel_data_segment[i-1];
+        const auto end_wheel = wheel_data_segment[i];
+
+        // Check timestamp.
+        assert(std::abs(begin_wheel->timestamp - state_.timestamp) < 1e-6);
+
+        propagator_->Propagate(begin_wheel->left, begin_wheel->right,
+                               end_wheel->left, end_wheel->right,
+                               &state_);
+
+        // Set timestamp.
+        state_.timestamp = end_wheel->timestamp;
+    }
     
     // Track feature.
 

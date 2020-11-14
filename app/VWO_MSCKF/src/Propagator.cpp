@@ -1,0 +1,35 @@
+#include <VWO/Propagator.h>
+
+#include <glog/logging.h>
+
+namespace VWO {
+
+Propagator::Propagator(const double kl, const double kr,const double b, const double noise_factor) {
+    wheel_propagator_ = std::make_unique<TGK::WheelProcessor::WheelPropagator>(kl, kr, b, noise_factor);
+}
+
+void Propagator::Propagate(const double begin_wl, const double begin_wr,
+                           const double end_wl, const double end_wr,
+                           State* state) {
+    // Propagate mean and covariance of the wheel pose state.
+    Eigen::Matrix<double, 6, 6> Phi;
+    Eigen::Matrix<double, 6, 6> wheel_pose_cov = state->covariance_.topLeftCorner<6, 6>();
+    wheel_propagator_->PropagateUsingEncoder(begin_wl, begin_wr, end_wl, end_wr, 
+                                             &state->wheel_pose_.G_R_O, &state->wheel_pose_.G_p_O,
+                                             &Phi, 
+                                             &wheel_pose_cov);
+    state->covariance_.topLeftCorner<6, 6>() = wheel_pose_cov;
+    
+    // Propagate covariance of other states.
+    const int cov_size = state->covariance_.rows();
+    const int other_size = cov_size - 6;
+    if (other_size <= 0) { return; }
+
+    state->covariance_.block(0, 6, 6, other_size) = 
+        Phi * state->covariance_.block(0, 6, 6, other_size).eval();
+
+    //Force symmetric.
+    state->covariance_ = state->covariance_.eval().selfadjointView<Eigen::Upper>();
+}
+
+}  // namespace VWO

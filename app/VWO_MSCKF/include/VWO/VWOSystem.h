@@ -11,6 +11,7 @@
 
 #include <VWO/Initializer.h>
 #include <VWO/Parameter.h>
+#include <VWO/Propagator.h>
 #include <VWO/State.h>
 #include <VWO/Visualizer.h>
 
@@ -33,6 +34,7 @@ private:
     std::unique_ptr<TGK::DataSynchronizer::WheelImageSynchronizer> data_sync_;
     std::unique_ptr<Initializer> initializer_;
     std::unique_ptr<Visualizer> viz_;
+    std::unique_ptr<Propagator> propagator_;
 
     bool initialized_;
     Parameter param_;

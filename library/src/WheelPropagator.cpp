@@ -46,7 +46,7 @@ void WheelPropagator::PropagateUsingEncoder(const double begin_wl, const double 
             (Eigen::Matrix2d() << left_dist * noise_factor_, 0., 
                                   0.,                        right_dist * noise_factor_).finished();
 
-        *cov = (*J_wrt_pose) * *cov * J_wrt_pose->transpose() + 
+        *cov = (*J_wrt_pose) * cov->eval() * J_wrt_pose->transpose() + 
                J_wrt_lr_dist * dist_noise * J_wrt_lr_dist.transpose();
 
         // Additive noise for roll pitch and　z.
