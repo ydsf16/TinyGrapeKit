@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+#include <unordered_map>
 #include <Eigen/Geometry>
 
 namespace VWO {
@@ -45,14 +47,15 @@ struct CameraFrame : public StateBlock {
     // SE3 of this frame.
     Eigen::Matrix3d G_R_C;
     Eigen::Vector3d G_p_C;
-    // Features in this frame.
-    std::vector<Eigen::Vector2d> im_fts;
-    std::vector<long int> ft_ids;
+
+    // Features in this frame. ID to point in image.
+    std::unordered_map<long int, Eigen::Vector2d> id_pt_map;
 
     void Update(const Eigen::Matrix<double, 6, 1>& delta_x) {
         UpdateSE3(delta_x, &G_R_C, &G_p_C);
     }
 };
+using CameraFramePtr = std::shared_ptr<CameraFrame>;
 
 struct Extrinsic : public StateBlock {
     Extrinsic() { size = 6; }

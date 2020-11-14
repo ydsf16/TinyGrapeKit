@@ -5,13 +5,13 @@ namespace VWO {
 
 /// Causion: This function does not process frame id
 void AugmentState(const double timestamp, const long int frame_id, State* state) {
-    CameraFrame cam_frame;
-    cam_frame.timestamp = timestamp;
-    cam_frame.id = frame_id;
+    const CameraFramePtr cam_frame = std::make_shared<CameraFrame>();
+    cam_frame->timestamp = timestamp;
+    cam_frame->id = frame_id;
     
     // Compute mean.
-    cam_frame.G_R_C = state->wheel_pose.G_R_O * state->extrinsic.O_R_C;
-    cam_frame.G_p_C = state->wheel_pose.G_p_O + state->wheel_pose.G_R_O * state->extrinsic.O_p_C;
+    cam_frame->G_R_C = state->wheel_pose.G_R_O * state->extrinsic.O_R_C;
+    cam_frame->G_p_C = state->wheel_pose.G_p_O + state->wheel_pose.G_R_O * state->extrinsic.O_p_C;
 
     // Push to state vector.
     state->camera_frames.push_back(cam_frame);

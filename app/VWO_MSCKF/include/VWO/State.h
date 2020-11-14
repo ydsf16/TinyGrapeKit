@@ -16,7 +16,7 @@ struct State {
     // The current wheel pose.
     WheelPose wheel_pose;
     // Camera poses.
-    std::deque<CameraFrame> camera_frames;
+    std::deque<CameraFramePtr> camera_frames;
 
     // Covariance.
     Eigen::MatrixXd covariance;
@@ -26,8 +26,8 @@ struct State {
         wheel_pose.Update(delta_x.segment(wheel_pose.state_idx, wheel_pose.size));
 
         // Update Camera pose.
-        for (CameraFrame& cam_fm : camera_frames) {
-            cam_fm.Update(delta_x.segment(cam_fm.state_idx, cam_fm.size));
+        for (CameraFramePtr& cam_fm : camera_frames) {
+            cam_fm->Update(delta_x.segment(cam_fm->state_idx, cam_fm->size));
         }
     }
 };
