@@ -40,6 +40,8 @@ private:
     Parameter param_;
 
     State state_;
+    
+    static long int kFrameId;
 };
 
 }  // namespace VWO

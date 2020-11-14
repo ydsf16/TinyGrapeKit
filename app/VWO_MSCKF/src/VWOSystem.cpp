@@ -4,8 +4,11 @@
 #include <glog/logging.h>
 
 #include <VWO/ParamLoader.h>
+#include <VWO/StateAugmentor.h>
 
 namespace VWO {
+
+long int VWOSystem::kFrameId = -1;
 
 VWOSystem::VWOSystem(const std::string& param_file) : initialized_(false) {
     /// Load parameters.
@@ -60,14 +63,13 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
         state_.timestamp = end_wheel->timestamp;
     }
     
-    // Track feature.
-
-    // Agument state.
+    // Augment state / Clone new camera state.
+    AugmentState(img_ptr->timestamp, (++kFrameId), &state_);
 
     // Update state.
 
     /// Visualize.
-    viz_->DrawWheelPose(state_.wheel_pose_.G_R_O, state_.wheel_pose_.G_p_O);
+    viz_->DrawWheelPose(state_.wheel_pose.G_R_O, state_.wheel_pose.G_p_O);
 
     return true;
 }
