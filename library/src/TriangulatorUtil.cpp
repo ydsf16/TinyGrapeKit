@@ -1,7 +1,10 @@
 #include <Geometry/TriangulatorUtil.h>
 
+#include <ceres/ceres.h>
 #include <Eigen/Dense>
 #include <glog/logging.h>
+
+#include <Camera/Camera.h>
 
 namespace TGK {
 namespace Geometry {
@@ -49,11 +52,76 @@ bool TriangulateDLT(const std::vector<Eigen::Matrix3d>& C_R_Gs,
     return true;                     
 }
 
-bool RefineGlobalPoint(const std::vector<Eigen::Matrix3d>& C_R_Gs, 
+class ProjectionCostFunc : public ceres::SizedCostFunction<2, 4> {
+public:
+    ProjectionCostFunc(const Camera::CameraPtr camera,
+                       const Eigen::Matrix3d& C_R_G, 
+                       const Eigen::Vector3d& C_p_G, 
+                       const Eigen::Vector2d& im_pt)
+        : camera_(camera), C_R_G_(C_R_G), C_p_G_(C_p_G), im_pt_(im_pt) { }
+
+  virtual ~ProjectionCostFunc() { }
+
+  virtual bool Evaluate(double const* const* parameters,
+                        double* residuals,
+                        double** jacobians) const {
+    const bool compute_jacobian = (jacobians != nullptr && jacobians[0] != nullptr);
+    
+    const Eigen::Map<const Eigen::Vector3d> G_p(parameters[0]);
+    const Eigen::Vector3d C_p = C_R_G_ * G_p + C_p_G_;
+    Eigen::Vector2d exp_im_pt;
+    Eigen::Matrix<double, 2, 3> J_Ip_wrt_Cp;
+    if (!camera_->CameraToImage(C_p, &exp_im_pt, compute_jacobian ? &J_Ip_wrt_Cp : nullptr)) {
+        return false;
+    }
+
+    // Compute residual.
+    Eigen::Map<Eigen::Vector2d> res_vec(residuals);
+    res_vec = im_pt_ - exp_im_pt;
+
+    // Compute the Jacobian if asked for.
+    if (compute_jacobian) {
+        Eigen::Map<Eigen::Matrix<double, 2, 3>> J_wrt_G_p(jacobians[0]);
+        const Eigen::Matrix3d& J_Cp_wrt_Gp = C_R_G_;
+        // Add negative for the optimization problem.
+        J_wrt_G_p = -J_Ip_wrt_Cp * J_Cp_wrt_Gp;
+    }
+
+    return true;
+  }
+
+private:
+    const Camera::CameraPtr camera_;
+    const Eigen::Matrix3d C_R_G_;
+    const Eigen::Vector3d C_p_G_;
+    const Eigen::Vector2d im_pt_;
+};
+
+void RefineGlobalPoint(const Camera::CameraPtr camera,
+                       const std::vector<Eigen::Matrix3d>& C_R_Gs, 
                        const std::vector<Eigen::Vector3d>& C_p_Gs,
                        const std::vector<Eigen::Vector2d>& im_points,
                        Eigen::Vector3d* G_p) {
-                               
+    // Build the problem.
+    ceres::Problem problem;
+    
+    // Add cost functions.
+    for (size_t i = 0; i < C_R_Gs.size(); ++i) {
+        ceres::CostFunction* cost_func = new ProjectionCostFunc(camera, C_R_Gs[i], C_p_Gs[i], im_points[i]);
+        problem.AddResidualBlock(cost_func, new ceres::HuberLoss(std::sqrt(5.99)), G_p->data());
+    }
+
+    // Run the solver!
+    ceres::Solver::Options options;
+    options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
+    options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
+    options.max_num_iterations = 5;
+    options.minimizer_progress_to_stdout = true;
+    ceres::Solver::Summary summary;
+    ceres::Solve(options, &problem, &summary);
+
+    // [debug]
+    LOG(INFO) << summary.BriefReport() << "\n";               
 }
 
 }  // namespace Geometry

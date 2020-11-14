@@ -7,6 +7,10 @@ namespace Geometry {
 
 class Triangulator {
 public:
+    struct Config {
+        double max_proj_res = 5.;
+    };
+
     Triangulator(const Camera::CameraPtr camera);
 
     bool Triangulate(const std::vector<Eigen::Matrix3d>& G_R_Cs, 
@@ -16,6 +20,7 @@ public:
 
 private:
     Camera::CameraPtr camera_;
+    Config config_;
 };
 
 } // namespace Geometry

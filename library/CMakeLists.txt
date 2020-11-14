@@ -14,6 +14,8 @@ find_package(Glog  REQUIRED)
 include_directories(${GLOG_INCLUDE_DIR})
 find_package(OpenCV 3 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS}/opencv4)
+find_package(Ceres REQUIRED)
+include_directories(${CERES_INCLUDE_DIRS})
 
 include_directories(include)
 # Make library
@@ -25,7 +27,7 @@ file(GLOB_RECURSE ALL_SRC_FILES
 )
 
 add_library(${PROJECT_NAME} SHARED ${ALL_SRC_FILES})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${CERES_INCLUDE_DIRS})
 
 # install
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install)
