@@ -13,7 +13,7 @@ bool TriangulateDLT(const std::vector<Eigen::Matrix3d>& C_R_Gs,
                     const std::vector<Eigen::Vector2d>& NSP_points,
                     Eigen::Vector3d* G_p);
 
-void RefineGlobalPoint(const Camera::CameraPtr camera,
+bool RefineGlobalPoint(const Camera::CameraPtr camera,
                        const std::vector<Eigen::Matrix3d>& C_R_Gs, 
                        const std::vector<Eigen::Vector3d>& C_p_Gs,
                        const std::vector<Eigen::Vector2d>& im_points,

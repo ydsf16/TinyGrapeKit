@@ -99,7 +99,7 @@ private:
     const Eigen::Vector2d im_pt_;
 };
 
-void RefineGlobalPoint(const Camera::CameraPtr camera,
+bool RefineGlobalPoint(const Camera::CameraPtr camera,
                        const std::vector<Eigen::Matrix3d>& C_R_Gs, 
                        const std::vector<Eigen::Vector3d>& C_p_Gs,
                        const std::vector<Eigen::Vector2d>& im_points,
@@ -117,13 +117,14 @@ void RefineGlobalPoint(const Camera::CameraPtr camera,
     ceres::Solver::Options options;
     options.linear_solver_type = ceres::DENSE_NORMAL_CHOLESKY;
     options.trust_region_strategy_type = ceres::LEVENBERG_MARQUARDT;
-    options.max_num_iterations = 5;
-    options.minimizer_progress_to_stdout = true;
+    options.max_num_iterations = 10;
+    options.minimizer_progress_to_stdout = false;
     ceres::Solver::Summary summary;
-    ceres::Solve(options, &problem, &summary);
+    ceres::Solve(options, &problem, &summary); 
 
-    // [debug]
-    LOG(INFO) << summary.BriefReport() << "\n";               
+    if (summary.termination_type == ceres::FAILURE) { return false; } 
+
+    return true;        
 }
 
 }  // namespace Geometry

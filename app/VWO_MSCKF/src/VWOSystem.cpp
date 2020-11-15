@@ -84,16 +84,27 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
     // Augment state / Clone new camera state.
     AugmentState(img_ptr->timestamp, (++kFrameId), &state_);
 
-    const bool marg_old_state = state_.covariance.rows() >= config_.sliding_window_size;
+    const bool marg_old_state = state_.camera_frames.size() >= config_.sliding_window_size;
 
     // Update state.
     std::vector<Eigen::Vector2d> tracked_features;
     std::vector<Eigen::Vector2d> new_features;
     std::vector<Eigen::Vector3d> map_points;
-    updater_->UpdateState(img_ptr->image, marg_old_state, &state_, &tracked_features, &new_features, &map_points);
+    if (marg_old_state) { 
+        updater_->UpdateState(img_ptr->image, marg_old_state, &state_, &tracked_features, &new_features, &map_points);
+    }
 
     // Marginalize old state.
     if (marg_old_state) { MargOldestState(&state_); }
+
+    // [Debug]
+    for (size_t i = 0; i < state_.covariance.rows(); ++i) {
+        for (size_t j = 0; j < state_.covariance.cols(); ++j) {
+            if(std::abs(state_.covariance(i,j) - state_.covariance(j, i)) > 1e-12) {
+                exit(-1);
+            }
+        }
+    }
 
     /// Visualize.
     viz_->DrawWheelPose(state_.wheel_pose.G_R_O, state_.wheel_pose.G_p_O);

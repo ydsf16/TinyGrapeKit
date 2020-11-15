@@ -45,22 +45,28 @@ bool Triangulator::Triangulate(const std::vector<Eigen::Matrix3d>& G_R_Cs,
     }
 
     // Non-linear refinement.
-    RefineGlobalPoint(camera_, C_R_Gs, C_p_Gs, im_pts, G_p);
+    if (!RefineGlobalPoint(camera_, C_R_Gs, C_p_Gs, im_pts, G_p)) {
+        return false;
+    }
 
     // Reject if the projection error is too large.
     for (size_t i = 0; i < C_R_Gs.size(); ++i) {
         const Eigen::Matrix3d& C_R_G = C_R_Gs[i];
         const Eigen::Vector3d& C_p_G = C_p_Gs[i];
         const Eigen::Vector3d C_p = C_R_G * *G_p + C_p_G;
+        if (C_p[2] < config_.min_dist || C_p[2] > config_.max_dist) {
+            return false;
+        }
+
         Eigen::Vector2d exp_I_p;
         if (!camera_->CameraToImage(C_p, &exp_I_p)) {
-            LOG(WARNING) << "[Triangulate]: Failed to project refined triangulated point to image.";
+            // LOG(WARNING) << "[Triangulate]: Failed to project refined triangulated point to image.";
             return false;
         }
 
         const double error = (im_pts[i] - exp_I_p).norm();
         if (error > config_.max_proj_res) {
-            LOG(WARNING) << "[Triangulate]: Too large projection error: " << std::fixed << error;
+            // LOG(WARNING) << "[Triangulate]: Too large projection error: " << std::fixed << error;
             return false;
         }
     }

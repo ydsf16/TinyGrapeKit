@@ -16,6 +16,8 @@ class Updater {
 public:
     struct Config {
         double visual_noise = 1. * 1.; // 1 pixel std.
+        double min_window_length = 3.;
+        int min_res_size = 50;
     };
 
     struct FeatureObservation {

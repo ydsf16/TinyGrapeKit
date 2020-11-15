@@ -3,6 +3,8 @@
 #include <vector>
 #include <unordered_set>
 
+#include <glog/logging.h>
+
 #include <TGK/Util/Util.h>
 #include <VWO/UpdaterUtil.h>
 
@@ -58,6 +60,7 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
 
     // Collect image point & camera state pairs.
     std::vector<std::vector<std::pair<Eigen::Vector2d, CameraFramePtr>>> features_obs;
+    features_obs.reserve(lost_ft_ids_set.size());
     for (const long int id : lost_ft_ids_set) {
         std::vector<std::pair<Eigen::Vector2d, CameraFramePtr>> one_feature;
         for (const auto cam_fm : state->camera_frames) {
@@ -66,9 +69,12 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
             const Eigen::Vector2d& im_pt = iter->second;
             one_feature.emplace_back(im_pt, cam_fm);
         }
+
+        if (one_feature.size() < 3) { continue; }
         features_obs.push_back(one_feature);
     }
-
+    const int state_size = state->covariance.rows();
+    
     /// Triangulate points.
     map_points->clear();
     map_points->reserve(lost_ft_ids_set.size());
@@ -93,25 +99,27 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
     }
 
     /// Compute Jacobian.
-    const int state_size = state->covariance.rows();
     Eigen::MatrixXd H;
     Eigen::VectorXd r;
     ComputeVisualResidualJacobian(features_full_obs, state_size, &r, &H);
-    
-    /// Compress measurement.
-    Eigen::MatrixXd H_cmp;
-    Eigen::VectorXd r_cmp;
-    CompressMeasurement(H, r, &H_cmp, &r_cmp);
 
-    /// TODO: Chi2 test.
+    const double window_length = (state->camera_frames.front()->G_p_C  - state->camera_frames.back()->G_p_C).norm();
+    if (H.rows() > config_.min_res_size && window_length > config_.min_window_length) { 
+        /// Compress measurement.
+        Eigen::MatrixXd H_cmp;
+        Eigen::VectorXd r_cmp;
+        CompressMeasurement(H, r, &H_cmp, &r_cmp);
 
-    /// EKF update.
-    Eigen::MatrixXd V(H_cmp.rows(), H_cmp.rows());
-    V.setIdentity();
-    V = V.eval() * config_.visual_noise;
-    EKFUpdate(H_cmp, r_cmp, V, state);
+        /// TODO: Chi2 test.
 
-    // Plane constraint update. TODO: Put together.
+        /// EKF update.
+        Eigen::MatrixXd V(H_cmp.rows(), H_cmp.rows());
+        V.setIdentity();
+        V = V.eval() * config_.visual_noise;
+        EKFUpdate(H_cmp, r_cmp, V, state);
+    }
+
+    // Plane constraint update.
     Eigen::Vector3d plane_res;
     Eigen::Matrix<double, 3, 6> plane_H;
     ComputePlaneConstraintResidualJacobian(state->wheel_pose.G_R_O, state->wheel_pose.G_p_O, &plane_res, &plane_H);
@@ -164,9 +172,10 @@ bool Updater::ComputeProjectionResidualJacobian(const Eigen::Matrix3d& G_R_C,
     // Jacobian.
     Eigen::Matrix<double, 3, 6> J_Cp_wrt_cam_pose;
     J_Cp_wrt_cam_pose << TGK::Util::Skew(C_p), -G_R_C.transpose();
-    const Eigen::Matrix3d J_cp_wrt_Gp = G_R_C.transpose();
+
+    const Eigen::Matrix3d J_Cp_wrt_Gp = G_R_C.transpose();
     *J_wrt_cam_pose = J_wrt_Cp * J_Cp_wrt_cam_pose;
-    *J_wrt_Gp = J_wrt_Cp * J_cp_wrt_Gp;
+    *J_wrt_Gp = J_wrt_Cp * J_Cp_wrt_Gp;
 
     return true;
 }
@@ -202,7 +211,6 @@ void Updater::ComputeOnePointResidualJacobian(const Updater::FeatureObservation&
         one_J_wrt_state.setZero();
         one_J_wrt_state.block<2, 6>(0, col_idx) = J_wrt_cam_pose;
         Js_wrt_state.push_back(one_J_wrt_state);
-
         Js_wrt_feature.push_back(J_wrt_Gp);
     }
 
