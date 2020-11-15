@@ -7,6 +7,7 @@
 #include <TGK/Geometry/Triangulator.h>
 #include <VWO/ParamLoader.h>
 #include <VWO/StateAugmentor.h>
+#include <VWO/StateMarginalizer.h>
 
 namespace VWO {
 
@@ -83,11 +84,16 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
     // Augment state / Clone new camera state.
     AugmentState(img_ptr->timestamp, (++kFrameId), &state_);
 
+    const bool marg_old_state = state_.covariance.rows() >= config_.sliding_window_size;
+
     // Update state.
     std::vector<Eigen::Vector2d> tracked_features;
     std::vector<Eigen::Vector2d> new_features;
     std::vector<Eigen::Vector3d> map_points;
-    updater_->UpdateState(img_ptr->image, true, &state_, &tracked_features, &new_features, &map_points);
+    updater_->UpdateState(img_ptr->image, marg_old_state, &state_, &tracked_features, &new_features, &map_points);
+
+    // Marginalize old state.
+    if (marg_old_state) { MargOldestState(&state_); }
 
     /// Visualize.
     viz_->DrawWheelPose(state_.wheel_pose.G_R_O, state_.wheel_pose.G_p_O);

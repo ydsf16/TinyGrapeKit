@@ -124,6 +124,24 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
     plane_noise(1, 1) = 0.01;
     plane_noise(2, 2) = 0.01;
     EKFUpdate(big_plane_H, plane_res, plane_noise, state);
+
+    // Remove use/lost features.
+    RemoveUsedFeatures(lost_ft_ids_set, state);
+}
+
+void Updater::RemoveUsedFeatures(const std::unordered_set<long int>& lost_ft_ids_set, State* state) {
+    // Remove used features
+    for (const auto& id : lost_ft_ids_set) {
+        // Remove features in state.
+        for (auto cam_fm : state->camera_frames) {
+            auto iter = cam_fm->id_pt_map.find(id);
+            if (iter == cam_fm->id_pt_map.end()) { continue; }
+            cam_fm->id_pt_map.erase(iter);
+        }
+
+        // Remove features in feature tracker.
+        feature_tracker_->DeleteFeature(id);
+    }
 }
 
 bool Updater::ComputeProjectionResidualJacobian(const Eigen::Matrix3d& G_R_C,

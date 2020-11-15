@@ -13,6 +13,9 @@ void AugmentState(const double timestamp, const long int frame_id, State* state)
     cam_frame->G_R_C = state->wheel_pose.G_R_O * state->extrinsic.O_R_C;
     cam_frame->G_p_C = state->wheel_pose.G_p_O + state->wheel_pose.G_R_O * state->extrinsic.O_p_C;
 
+    // Set index.
+    cam_frame->state_idx = state->covariance.rows();
+
     // Push to state vector.
     state->camera_frames.push_back(cam_frame);
 

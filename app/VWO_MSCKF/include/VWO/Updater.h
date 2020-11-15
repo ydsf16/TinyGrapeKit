@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <unordered_set>
 
 #include <opencv2/opencv.hpp>
 
@@ -53,6 +54,8 @@ private:
                                        const int state_size,
                                        Eigen::VectorXd* res, 
                                        Eigen::MatrixXd* Jacobian);
+
+    void RemoveUsedFeatures(const std::unordered_set<long int>& lost_ft_ids_set, State* state);
 
     const Config config_;
     const TGK::Camera::CameraPtr camera_;
