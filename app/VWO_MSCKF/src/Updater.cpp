@@ -1,12 +1,18 @@
 #include <VWO/Updater.h>
 
+#include <vector>
 #include <unordered_set>
+
+#include <TGK/Util/Util.h>
+#include <VWO/UpdaterUtil.h>
 
 namespace VWO {
 
-Updater::Updater(const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker,
+Updater::Updater(const Config& config,
+                 const std::shared_ptr<TGK::Camera::Camera> camera,
+                 const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker,
                  const std::shared_ptr<TGK::Geometry::Triangulator> triangulator)
-    : feature_tracker_(feature_tracker), triangulator_(triangulator) { }
+    : config_(config), camera_(camera), feature_tracker_(feature_tracker), triangulator_(triangulator) { }
 
 void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* state, 
                           std::vector<Eigen::Vector2d>* tracked_features,
@@ -63,13 +69,6 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
         features_obs.push_back(one_feature);
     }
 
-    struct FeatureObservation {
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        std::vector<CameraFramePtr> camera_frame;
-        std::vector<Eigen::Vector2d> im_pts;
-        Eigen::Vector3d G_p;
-    };
-
     /// Triangulate points.
     map_points->clear();
     map_points->reserve(lost_ft_ids_set.size());
@@ -93,7 +92,152 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
         map_points->push_back(one_feaute.G_p);
     }
 
+    /// Compute Jacobian.
+    const int state_size = state->covariance.rows();
+    Eigen::MatrixXd H;
+    Eigen::VectorXd r;
+    ComputeVisualResidualJacobian(features_full_obs, state_size, &r, &H);
     
+    /// Compress measurement.
+    Eigen::MatrixXd H_cmp;
+    Eigen::VectorXd r_cmp;
+    CompressMeasurement(H, r, &H_cmp, &r_cmp);
+
+    /// TODO: Chi2 test.
+
+    /// EKF update.
+    Eigen::MatrixXd V(H_cmp.rows(), H_cmp.rows());
+    V.setIdentity();
+    V = V.eval() * config_.visual_noise;
+    EKFUpdate(H_cmp, r_cmp, V, state);
+
+    // Plane constraint update. TODO: Put together.
+    Eigen::Vector3d plane_res;
+    Eigen::Matrix<double, 3, 6> plane_H;
+    ComputePlaneConstraintResidualJacobian(state->wheel_pose.G_R_O, state->wheel_pose.G_p_O, &plane_res, &plane_H);
+    Eigen::MatrixXd big_plane_H(3, state_size);
+    big_plane_H.setZero();
+    big_plane_H.block<3, 6>(0, 0) = plane_H;
+
+    Eigen::Matrix3d plane_noise = Eigen::Matrix3d::Identity();
+    plane_noise(0, 0) = 0.01;
+    plane_noise(1, 1) = 0.01;
+    plane_noise(2, 2) = 0.01;
+    EKFUpdate(big_plane_H, plane_res, plane_noise, state);
+}
+
+bool Updater::ComputeProjectionResidualJacobian(const Eigen::Matrix3d& G_R_C,
+                                                const Eigen::Vector3d& G_p_C,
+                                                const Eigen::Vector2d& im_pt,
+                                                const Eigen::Vector3d& G_p,
+                                                Eigen::Vector2d* res,
+                                                Eigen::Matrix<double, 2, 6>* J_wrt_cam_pose,
+                                                Eigen::Matrix<double, 2, 3>* J_wrt_Gp) {
+    const Eigen::Vector3d C_p = G_R_C.transpose() * (G_p - G_p_C);
+    Eigen::Vector2d exp_im_pt; 
+    Eigen::Matrix<double, 2, 3> J_wrt_Cp;
+    if (!camera_->CameraToImage(C_p, &exp_im_pt, &J_wrt_Cp)) {
+        return false;
+    }
+    
+    // Compute residual
+    *res = im_pt - exp_im_pt;
+
+    // Jacobian.
+    Eigen::Matrix<double, 3, 6> J_Cp_wrt_cam_pose;
+    J_Cp_wrt_cam_pose << TGK::Util::Skew(C_p), -G_R_C.transpose();
+    const Eigen::Matrix3d J_cp_wrt_Gp = G_R_C.transpose();
+    *J_wrt_cam_pose = J_wrt_Cp * J_Cp_wrt_cam_pose;
+    *J_wrt_Gp = J_wrt_Cp * J_cp_wrt_Gp;
+
+    return true;
+}
+
+void Updater::ComputeOnePointResidualJacobian(const Updater::FeatureObservation& one_feature_obs, 
+                                              const int state_size,
+                                              Eigen::VectorXd* residual, 
+                                              Eigen::MatrixXd* Hx,
+                                              Eigen::Matrix<double, Eigen::Dynamic, 3>* Hf) {
+    const Eigen::Vector3d& G_p = one_feature_obs.G_p;
+    const std::vector<CameraFramePtr>& camera_frame = one_feature_obs.camera_frame;
+    const std::vector<Eigen::Vector2d>& im_pts = one_feature_obs.im_pts;
+
+    std::vector<Eigen::Vector2d> residuals;
+    std::vector<Eigen::Matrix<double, 2, Eigen::Dynamic>> Js_wrt_state;
+    std::vector<Eigen::Matrix<double, 2, 3>> Js_wrt_feature;
+    for (size_t i = 0; i < camera_frame.size(); ++i) {
+        int col_idx = camera_frame[i]->state_idx;
+        const Eigen::Matrix3d& G_R_C = camera_frame[i]->G_R_C;
+        const Eigen::Vector3d& G_p_C = camera_frame[i]->G_p_C;
+        const Eigen::Vector2d& im_pt = im_pts[i];
+        
+        Eigen::Vector2d res;
+        Eigen::Matrix<double, 2, 6> J_wrt_cam_pose;
+        Eigen::Matrix<double, 2, 3> J_wrt_Gp;
+        if (!ComputeProjectionResidualJacobian(G_R_C, G_p_C, im_pt, G_p, &res, &J_wrt_cam_pose, &J_wrt_Gp)) {
+            continue;
+        }
+
+        residuals.push_back(res);
+
+        Eigen::Matrix<double, 2, Eigen::Dynamic> one_J_wrt_state(2, state_size);
+        one_J_wrt_state.setZero();
+        one_J_wrt_state.block<2, 6>(0, col_idx) = J_wrt_cam_pose;
+        Js_wrt_state.push_back(one_J_wrt_state);
+
+        Js_wrt_feature.push_back(J_wrt_Gp);
+    }
+
+    const int num_rows = Js_wrt_state.size() * 2;
+    residual->resize(num_rows);
+    Hx->resize(num_rows, state_size);
+    Hf->resize(num_rows, 3);
+
+    for (size_t i = 0; i < Js_wrt_state.size(); ++i) {
+        const int row_idx = 2 * i;
+        residual->segment<2>(row_idx) = residuals[i];
+        Hx->block(row_idx, 0, 2, state_size) = Js_wrt_state[i];
+        Hf->block(row_idx, 0, 2, 3) = Js_wrt_feature[i];
+    }
+}
+
+
+void Updater::ComputeVisualResidualJacobian(const std::vector<Updater::FeatureObservation>& features_full_obs, 
+                                            const int state_size,
+                                            Eigen::VectorXd* res, 
+                                            Eigen::MatrixXd* Jacobian) {
+    std::vector<Eigen::VectorXd> r_bars;
+    std::vector<Eigen::MatrixXd> H_bars;
+    r_bars.reserve(features_full_obs.size());
+    H_bars.reserve(features_full_obs.size());
+    int num_rows = 0;
+    for (const Updater::FeatureObservation& one_feature_obs : features_full_obs) {
+        Eigen::VectorXd res;
+        Eigen::MatrixXd Hx;
+        Eigen::Matrix<double, Eigen::Dynamic, 3> Hf;
+        ComputeOnePointResidualJacobian(one_feature_obs, state_size, &res, &Hx, &Hf);
+        if (res.size() < 4) { continue; }
+
+        // Left projection.
+        Eigen::MatrixXd H_bar;
+        Eigen::VectorXd r_bar;
+        LeftNullspaceProjection(Hx, Hf, res, &H_bar, &r_bar);
+
+        H_bars.push_back(H_bar);
+        r_bars.push_back(r_bar);
+        num_rows += H_bar.rows();
+    }
+
+    // Stack to big H and r matrices. 
+    res->resize(num_rows);
+    Jacobian->resize(num_rows, state_size);
+    int row_idx = 0;
+    for (size_t i = 0; i < H_bars.size(); ++i) {
+        const int one_num_rows = H_bars[i].rows();
+        res->segment(row_idx, one_num_rows) = r_bars[i];
+        Jacobian->block(row_idx, 0, one_num_rows, state_size) = H_bars[i];
+        row_idx += one_num_rows;
+    }
 }
 
 }  // namespace VWO

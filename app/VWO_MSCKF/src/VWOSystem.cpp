@@ -37,7 +37,8 @@ VWOSystem::VWOSystem(const std::string& param_file) : initialized_(false) {
         param_.cam_intrinsic.k3);
 
     const auto triangulator = std::make_shared<TGK::Geometry::Triangulator>(camera_);
-    updater_ = std::make_unique<Updater>(feature_tracker, triangulator);
+    Updater::Config updater_config;
+    updater_ = std::make_unique<Updater>(updater_config, camera_, feature_tracker, triangulator);
 
     viz_ = std::make_unique<Visualizer>(param_.viz_config);
 }
