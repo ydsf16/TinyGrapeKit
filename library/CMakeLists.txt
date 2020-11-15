@@ -27,7 +27,7 @@ file(GLOB_RECURSE ALL_SRC_FILES
 )
 
 add_library(${PROJECT_NAME} SHARED ${ALL_SRC_FILES})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${CERES_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${CERES_LIBRARIES})
 
 # install
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install)

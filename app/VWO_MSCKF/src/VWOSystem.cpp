@@ -3,6 +3,8 @@
 #include <assert.h>
 #include <glog/logging.h>
 
+#include <TGK/Camera/PinholeRanTanCamera.h>
+#include <TGK/Geometry/Triangulator.h>
 #include <VWO/ParamLoader.h>
 #include <VWO/StateAugmentor.h>
 
@@ -22,6 +24,20 @@ VWOSystem::VWOSystem(const std::string& param_file) : initialized_(false) {
 
     propagator_ = std::make_unique<Propagator>(param_.wheel_param.kl, param_.wheel_param.kr, param_.wheel_param.b, 
                                                param_.wheel_param.noise_factor);
+
+    const auto feature_tracker = std::make_shared<TGK::ImageProcessor::FeatureTracker>(
+        TGK::ImageProcessor::FeatureTracker::Config());
+
+    camera_ = std::make_shared<TGK::Camera::PinholeRadTanCamera>(
+        param_.cam_intrinsic.width, param_.cam_intrinsic.height,
+        param_.cam_intrinsic.fx, param_.cam_intrinsic.fy,
+        param_.cam_intrinsic.cx, param_.cam_intrinsic.cy,
+        param_.cam_intrinsic.k1, param_.cam_intrinsic.k2,
+        param_.cam_intrinsic.p1, param_.cam_intrinsic.p2,
+        param_.cam_intrinsic.k3);
+
+    const auto triangulator = std::make_shared<TGK::Geometry::Triangulator>(camera_);
+    updater_ = std::make_unique<Updater>(feature_tracker, triangulator);
 
     viz_ = std::make_unique<Visualizer>(param_.viz_config);
 }
@@ -67,9 +83,12 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
     AugmentState(img_ptr->timestamp, (++kFrameId), &state_);
 
     // Update state.
+    std::vector<Eigen::Vector3d> map_points;
+    updater_->UpdateState(img_ptr->image, true, &state_, &map_points);
 
     /// Visualize.
     viz_->DrawWheelPose(state_.wheel_pose.G_R_O, state_.wheel_pose.G_p_O);
+    viz_->DrawFeatures(map_points);
 
     return true;
 }

@@ -3,8 +3,10 @@
 #include <memory>
 
 #include <opencv2/opencv.hpp>
-#include <VWO/State.h>
+
+#include <TGK/Geometry/Triangulator.h>
 #include <TGK/ImageProcessor/FeatureTracker.h>
+#include <VWO/State.h>
 
 namespace VWO {
 
@@ -14,12 +16,15 @@ public:
         double param = 0.;
     };
 
-    Updater(const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker);
+    Updater(const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker,
+            const std::shared_ptr<TGK::Geometry::Triangulator> triangulator);
 
-    void UpdateState(const cv::Mat& image, const bool marg_oldest, State* state);
+    void UpdateState(const cv::Mat& image, const bool marg_oldest, State* state, 
+                     std::vector<Eigen::Vector3d>* map_points);
 
 private:
     const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker_; 
+    const std::shared_ptr<TGK::Geometry::Triangulator> triangulator_;
 };
 
 }  // namespace VWO

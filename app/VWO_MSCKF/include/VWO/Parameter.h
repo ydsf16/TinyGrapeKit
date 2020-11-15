@@ -17,6 +17,9 @@ struct CamParam {
     double p1;
     double p2;
     double k3;
+
+    int width;
+    int height;
 };
 
 struct WheelParam {

@@ -8,11 +8,13 @@
 
 #include <TGK/Camera/Camera.h>
 #include <TGK/DataSynchronizer/WheelImageSynchronizer.h>
+#include <TGK/Geometry/Triangulator.h>
 
 #include <VWO/Initializer.h>
 #include <VWO/Parameter.h>
 #include <VWO/Propagator.h>
 #include <VWO/State.h>
+#include <VWO/Updater.h>
 #include <VWO/Visualizer.h>
 
 namespace VWO {
@@ -35,7 +37,8 @@ private:
     std::unique_ptr<Initializer> initializer_;
     std::unique_ptr<Visualizer> viz_;
     std::unique_ptr<Propagator> propagator_;
-
+    std::unique_ptr<Updater> updater_;
+    
     bool initialized_;
     Parameter param_;
 

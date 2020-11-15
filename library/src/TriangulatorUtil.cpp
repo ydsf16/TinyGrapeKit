@@ -52,7 +52,7 @@ bool TriangulateDLT(const std::vector<Eigen::Matrix3d>& C_R_Gs,
     return true;                     
 }
 
-class ProjectionCostFunc : public ceres::SizedCostFunction<2, 4> {
+class ProjectionCostFunc : public ceres::SizedCostFunction<2, 3> {
 public:
     ProjectionCostFunc(const Camera::CameraPtr camera,
                        const Eigen::Matrix3d& C_R_G, 
@@ -81,7 +81,9 @@ public:
 
     // Compute the Jacobian if asked for.
     if (compute_jacobian) {
-        Eigen::Map<Eigen::Matrix<double, 2, 3>> J_wrt_G_p(jacobians[0]);
+        // The jacobian pointer is defined in row-major.
+        Eigen::Map<Eigen::Matrix<double, 2, 3, Eigen::RowMajor>> J_wrt_G_p(jacobians[0]);
+
         const Eigen::Matrix3d& J_Cp_wrt_Gp = C_R_G_;
         // Add negative for the optimization problem.
         J_wrt_G_p = -J_Ip_wrt_Cp * J_Cp_wrt_Gp;

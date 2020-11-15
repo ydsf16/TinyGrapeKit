@@ -20,6 +20,8 @@ void LoadParam(const std::string& param_file, Parameter* params) {
     params->cam_intrinsic.p1 = cv_params["Camera.p1"];
     params->cam_intrinsic.p2 = cv_params["Camera.p2"];
     params->cam_intrinsic.k3 = cv_params["Camera.k3"];
+    params->cam_intrinsic.width = cv_params["Camera.width"];
+    params->cam_intrinsic.height = cv_params["Camera.height"];
 
     // Load wheel intrinsic.
     params->wheel_param.kl = cv_params["Wheel.kl"];

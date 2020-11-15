@@ -4,10 +4,12 @@
 
 namespace VWO {
 
-Updater::Updater(const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker)
-    : feature_tracker_(feature_tracker) { }
+Updater::Updater(const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker,
+                 const std::shared_ptr<TGK::Geometry::Triangulator> triangulator)
+    : feature_tracker_(feature_tracker), triangulator_(triangulator) { }
 
-void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* state) {
+void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* state, 
+                          std::vector<Eigen::Vector3d>* map_points) {
     // Track image.
     std::vector<Eigen::Vector2d> tracked_pts; 
     std::vector<long int> tracked_pt_ids;
@@ -38,7 +40,7 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
     }
 
     // Collect image point & camera state pairs.
-    std::vector<std::vector<std::pair<Eigen::Vector2d, CameraFramePtr>>> point_cam_pairs;
+    std::vector<std::vector<std::pair<Eigen::Vector2d, CameraFramePtr>>> features_obs;
     for (const long int id : lost_ft_ids_set) {
         std::vector<std::pair<Eigen::Vector2d, CameraFramePtr>> one_feature;
         for (const auto cam_fm : state->camera_frames) {
@@ -47,12 +49,38 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
             const Eigen::Vector2d& im_pt = iter->second;
             one_feature.emplace_back(im_pt, cam_fm);
         }
+        features_obs.push_back(one_feature);
     }
+
+    struct FeatureObservation {
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        std::vector<CameraFramePtr> camera_frame;
+        std::vector<Eigen::Vector2d> im_pts;
+        Eigen::Vector3d G_p;
+    };
 
     /// Triangulate points.
     // img point, map point, camera state.
-    std::vector<std::vector<std::tuple<Eigen::Vector2d, Eigen::Vector3d, CameraFramePtr>>> observations;
-    
+    std::vector<FeatureObservation> features_full_obs;
+    features_full_obs.reserve(features_obs.size());
+    for (const std::vector<std::pair<Eigen::Vector2d, CameraFramePtr>>& one_ft_obs : features_obs) {
+        FeatureObservation one_feaute;
+        one_feaute.im_pts.reserve(one_ft_obs.size());
+        one_feaute.camera_frame.reserve(one_ft_obs.size());
+
+        std::vector<Eigen::Matrix3d> G_R_Cs;
+        std::vector<Eigen::Vector3d> G_p_Cs;
+        for (const auto& one_obs : one_ft_obs) {
+            G_R_Cs.push_back(one_obs.second->G_R_C);
+            G_p_Cs.push_back(one_obs.second->G_p_C);
+            one_feaute.im_pts.push_back(one_obs.first);
+            one_feaute.camera_frame.push_back(one_obs.second);
+        }
+
+        if (!triangulator_->Triangulate(G_R_Cs, G_p_Cs, one_feaute.im_pts, &one_feaute.G_p)) { continue; }
+
+        features_full_obs.push_back(one_feaute);
+    }
 
 
 }
