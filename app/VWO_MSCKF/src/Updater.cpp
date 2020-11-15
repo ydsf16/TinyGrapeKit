@@ -9,6 +9,8 @@ Updater::Updater(const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feat
     : feature_tracker_(feature_tracker), triangulator_(triangulator) { }
 
 void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* state, 
+                          std::vector<Eigen::Vector2d>* tracked_features,
+                          std::vector<Eigen::Vector2d>* new_features,
                           std::vector<Eigen::Vector3d>* map_points) {
     // Track image.
     std::vector<Eigen::Vector2d> tracked_pts; 
@@ -16,6 +18,15 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
     std::vector<long int> lost_pt_ids;
     std::set<long int> new_pt_ids;
     feature_tracker_->TrackImage(image, &tracked_pts, &tracked_pt_ids, &lost_pt_ids, &new_pt_ids);
+
+    // Collect features for observation.
+    *tracked_features = tracked_pts; 
+    for (size_t i = 0; i < tracked_pt_ids.size(); ++i) {
+        const long long pt_id = tracked_pt_ids[i];
+        if (new_pt_ids.count(pt_id) > 0) {
+            new_features->push_back(tracked_pts[i]);
+        }
+    }
 
     // Assuming a new clone has been inserted into the sliding window.
     CameraFramePtr new_cam_frame = state->camera_frames.back();
@@ -60,14 +71,14 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
     };
 
     /// Triangulate points.
-    // img point, map point, camera state.
+    map_points->clear();
+    map_points->reserve(lost_ft_ids_set.size());
     std::vector<FeatureObservation> features_full_obs;
     features_full_obs.reserve(features_obs.size());
     for (const std::vector<std::pair<Eigen::Vector2d, CameraFramePtr>>& one_ft_obs : features_obs) {
         FeatureObservation one_feaute;
         one_feaute.im_pts.reserve(one_ft_obs.size());
         one_feaute.camera_frame.reserve(one_ft_obs.size());
-
         std::vector<Eigen::Matrix3d> G_R_Cs;
         std::vector<Eigen::Vector3d> G_p_Cs;
         for (const auto& one_obs : one_ft_obs) {
@@ -78,11 +89,11 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
         }
 
         if (!triangulator_->Triangulate(G_R_Cs, G_p_Cs, one_feaute.im_pts, &one_feaute.G_p)) { continue; }
-
         features_full_obs.push_back(one_feaute);
+        map_points->push_back(one_feaute.G_p);
     }
 
-
+    
 }
 
 }  // namespace VWO

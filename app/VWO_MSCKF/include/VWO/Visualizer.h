@@ -38,7 +38,9 @@ public:
 
     void DrawFeatures(const std::vector<Eigen::Vector3d>& features);
 
-    void DrawImage(const cv::Mat& image);
+    void DrawImage(const cv::Mat& image,
+                   const std::vector<Eigen::Vector2d>& tracked_fts, 
+                   const std::vector<Eigen::Vector2d>& new_fts);
 
 private:
     void Run();

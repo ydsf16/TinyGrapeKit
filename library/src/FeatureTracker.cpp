@@ -25,14 +25,19 @@ void FeatureTracker::TrackImage(const cv::Mat& image,
         std::vector<uchar> track_status;
         std::vector<float> error;
         // Forward track.
-        cv::calcOpticalFlowPyrLK(last_image_, image, last_cv_pts_, track_cv_pts, track_status, error);
+        cv::calcOpticalFlowPyrLK(last_image_, image, last_cv_pts_, track_cv_pts, track_status, error,
+                                 cv::Size(21, 21), 3, 
+                                 cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01));
         
         // Backward track.
-        std::vector<cv::Point2f> bacK_track_cv_pts;
+        std::vector<cv::Point2f> bacK_track_cv_pts = last_cv_pts_;
         std::vector<uchar> back_track_status;
         std::vector<float> back_error;
-        cv::calcOpticalFlowPyrLK(image, last_image_, track_cv_pts, bacK_track_cv_pts, back_track_status, back_error);
-
+        cv::calcOpticalFlowPyrLK(image, last_image_, track_cv_pts, bacK_track_cv_pts, back_track_status, back_error,
+                                 cv::Size(21, 21), 3, 
+                                 cv::TermCriteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS, 30, 0.01),
+                                 cv::OPTFLOW_USE_INITIAL_FLOW);
+        
         for (size_t i = 0; i < track_cv_pts.size(); ++i) {
             const auto& pt_id = last_pt_ids_[i];
 
@@ -43,7 +48,7 @@ void FeatureTracker::TrackImage(const cv::Mat& image,
             const double dx = track_cv_pts[i].x - bacK_track_cv_pts[i].x;
             const double dy = track_cv_pts[i].y - bacK_track_cv_pts[i].y;
             const double dist = std::sqrt(dx * dx + dy * dy);
-            if (dist > 5.) { 
+            if (dist > 40.) { 
                 if (lost_pt_ids != nullptr) { lost_pt_ids->push_back(pt_id); }
                 continue; 
             }

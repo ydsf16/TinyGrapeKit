@@ -11,9 +11,9 @@ namespace ImageProcessor {
 class FeatureTracker {
 public:
     struct Config {
-        int max_num_corners = 200;
+        int max_num_corners = 100;
         double quality_level = 0.01;
-        double min_dist = 30.;
+        double min_dist = 40.;
     };
 
     FeatureTracker(const Config& config);

@@ -28,10 +28,23 @@ void Visualizer::DrawFeatures(const std::vector<Eigen::Vector3d>& features) {
     while (features_.size() > config_.max_num_features) { features_.pop_front(); } 
 }
 
-void Visualizer::DrawImage(const cv::Mat& image) {
+void Visualizer::DrawImage(const cv::Mat& image, 
+                           const std::vector<Eigen::Vector2d>& tracked_fts, 
+                           const std::vector<Eigen::Vector2d>& new_fts) {
+    // Covert gray image to color image.
+    cv::Mat color_img;
+    cv::cvtColor(image, color_img, cv::COLOR_GRAY2BGR);
+
+    // Draw features on image.
+    for (const Eigen::Vector2d& ft : tracked_fts) {
+        cv::circle(color_img, cv::Point(ft[0], ft[1]), 5, cv::Scalar(0, 255, 0), -1);
+    }
+    for (const Eigen::Vector2d& ft : new_fts) {
+        cv::circle(color_img, cv::Point(ft[0], ft[1]), 5, cv::Scalar(255, 0, 0), -1);
+    }
+    
     std::lock_guard<std::mutex> lg(data_buffer_mutex_);
-    image_ = image;
-    cv::resize(image, image_, cv::Size(config_.img_width, config_.img_heigh));
+    cv::resize(color_img, image_, cv::Size(config_.img_width, config_.img_heigh));
     cv::flip(image_, image_, 0);
 }
 

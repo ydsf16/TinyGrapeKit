@@ -27,11 +27,9 @@ public:
 
     bool FeedImageData(const double timestamp, const cv::Mat& image);
 
-    bool GetCameraPoses(std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>>* cam_poses);
-
-    bool GetWheelPose(Eigen::Matrix3d* G_R_O, Eigen::Vector3d* G_p_O);
-
 private:
+    std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> GetCameraPoses();
+
     std::shared_ptr<TGK::Camera::Camera> camera_;
     std::unique_ptr<TGK::DataSynchronizer::WheelImageSynchronizer> data_sync_;
     std::unique_ptr<Initializer> initializer_;

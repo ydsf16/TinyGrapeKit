@@ -83,12 +83,16 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
     AugmentState(img_ptr->timestamp, (++kFrameId), &state_);
 
     // Update state.
+    std::vector<Eigen::Vector2d> tracked_features;
+    std::vector<Eigen::Vector2d> new_features;
     std::vector<Eigen::Vector3d> map_points;
-    updater_->UpdateState(img_ptr->image, true, &state_, &map_points);
+    updater_->UpdateState(img_ptr->image, true, &state_, &tracked_features, &new_features, &map_points);
 
     /// Visualize.
     viz_->DrawWheelPose(state_.wheel_pose.G_R_O, state_.wheel_pose.G_p_O);
     viz_->DrawFeatures(map_points);
+    viz_->DrawCameras(GetCameraPoses());
+    viz_->DrawImage(img_ptr->image, tracked_features, new_features);
 
     return true;
 }
@@ -104,14 +108,14 @@ bool VWOSystem::FeedImageData(const double timestamp, const cv::Mat& image) {
     return true;
 }
 
-bool VWOSystem::GetCameraPoses(std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>>* cam_poses) {
-    
-    return true;
-}
+std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> VWOSystem::GetCameraPoses() {
+    std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> cam_poses;
+    cam_poses.clear();
+    for (const auto& cam_fm : state_.camera_frames) {
+        cam_poses.emplace_back(cam_fm->G_R_C, cam_fm->G_p_C);
+    }
 
-bool VWOSystem::GetWheelPose(Eigen::Matrix3d* G_R_O, Eigen::Vector3d* G_p_O) {
-        
-    return true;
+    return cam_poses;
 }
 
 }  // namespace VWO
