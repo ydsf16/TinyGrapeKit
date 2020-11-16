@@ -1,17 +1,17 @@
 %YAML:1.0
 
 # Camera intrinsic
-Camera.fx: 8.1640221474060002e+02
-Camera.fy: 8.1738388562809996e+02
-camera.s:  -2.3882017757999998e+00
-Camera.cx: 6.0882658427579997e+02
-Camera.cy: 2.6668865652440002e+02
+Camera.fx: 8.1690378992770002e+02
+Camera.fy: 8.1156803828490001e+02
+camera.s:  0
+Camera.cx: 6.0850726281690004e+02
+Camera.cy: 2.6347599764440002e+02
 
-Camera.k1: -5.0040485799999999e-02
-Camera.k2: 1.2001217170000000e-01
-Camera.p1: -6.2598060000000004e-04
-Camera.p2: -1.1825064000000000e-03
-Camera.k3: -6.3505207999999994e-02
+Camera.k1: 0
+Camera.k2: 0
+Camera.p1: 0
+Camera.p2: 0
+Camera.k3: 0.
 
 Camera.width: 1280
 Camera.height: 560

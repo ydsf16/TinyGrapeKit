@@ -114,6 +114,8 @@ void Visualizer::DrawOneCamera(const Eigen::Matrix3d& G_R_C, const Eigen::Vector
     glEnd();
 
     glPopMatrix();
+
+    pangolin::glDrawAxis(G_T_C, 0.2);
 }
 
 void Visualizer::DrawCameras() {

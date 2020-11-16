@@ -41,3 +41,17 @@ target_link_libraries(${PROJECT_NAME} TinyGrapeKit pangolin)
 ## Declare C++ executables
 add_executable(RunKAISTData example/RunKAISTData.cpp)
 target_link_libraries(RunKAISTData glog ${OpenCV_LIBS} TinyGrapeKit ${PROJECT_NAME})
+
+# ROS Interface
+find_package(catkin REQUIRED COMPONENTS
+    sensor_msgs
+    rosbag
+    cv_bridge
+)
+include_directories(${catkin_INCLUDE_DIRS})
+
+add_executable(RunRedBotData example/RunRedBotData.cpp)
+target_link_libraries(RunRedBotData
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME} glog ${OpenCV_LIBS} TinyGrapeKit 
+)
