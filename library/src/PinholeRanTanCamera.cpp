@@ -29,15 +29,17 @@ bool PinholeRadTanCamera::CameraToImage(const Eigen::Vector3d& C_p, Eigen::Vecto
         *I_p = DistortionToImage(D_p, &J_Ip_wrt_dist);
 
         *J_Ip_wrt_Cp = J_Ip_wrt_dist * J_dist_wrt_norm * J_norm_wrt_Cp;
-
-        return InImage(*I_p);
+        
+        //return InImage(*I_p);
+        return true;
     }
     
     const Eigen::Vector2d N_p = CameraToNormalized(C_p);
     const Eigen::Vector2d D_p = NormalizedToDistortion(N_p);
     *I_p = DistortionToImage(D_p);
 
-    return InImage(*I_p);
+    // return InImage(*I_p);
+    return true;
 }
 
 bool PinholeRadTanCamera::NSPToImage(const Eigen::Vector2d& NSP_p, Eigen::Vector2d* I_p, 

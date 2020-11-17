@@ -5,6 +5,8 @@
 
 #include <TGK/Camera/PinholeRanTanCamera.h>
 #include <TGK/Geometry/Triangulator.h>
+#include <TGK/ImageProcessor/KLTFeatureTracker.h>
+#include <TGK/ImageProcessor/ORBFeatureTracker.h>
 #include <VWO/ParamLoader.h>
 #include <VWO/StateAugmentor.h>
 #include <VWO/StateMarginalizer.h>
@@ -26,8 +28,8 @@ VWOSystem::VWOSystem(const std::string& param_file) : initialized_(false) {
     propagator_ = std::make_unique<Propagator>(param_.wheel_param.kl, param_.wheel_param.kr, param_.wheel_param.b, 
                                                param_.wheel_param.noise_factor);
 
-    const auto feature_tracker = std::make_shared<TGK::ImageProcessor::FeatureTracker>(
-        TGK::ImageProcessor::FeatureTracker::Config());
+    const auto feature_tracker = std::make_shared<TGK::ImageProcessor::KLTFeatureTracker>(
+        TGK::ImageProcessor::KLTFeatureTracker::Config());
 
     camera_ = std::make_shared<TGK::Camera::PinholeRadTanCamera>(
         param_.cam_intrinsic.width, param_.cam_intrinsic.height,
@@ -80,31 +82,24 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
         // Set timestamp.
         state_.timestamp = end_wheel->timestamp;
     }
-    
+
     // Augment state / Clone new camera state.
     AugmentState(img_ptr->timestamp, (++kFrameId), &state_);
 
+    // Do not marginalize the last state if no enough camera state in the buffer.
     const bool marg_old_state = state_.camera_frames.size() >= config_.sliding_window_size;
-
+    if (!marg_old_state) {
+        return true;
+    }
+    
     // Update state.
     std::vector<Eigen::Vector2d> tracked_features;
     std::vector<Eigen::Vector2d> new_features;
     std::vector<Eigen::Vector3d> map_points;
-    if (marg_old_state) { 
-        updater_->UpdateState(img_ptr->image, marg_old_state, &state_, &tracked_features, &new_features, &map_points);
-    }
+    updater_->UpdateState(img_ptr->image, marg_old_state, &state_, &tracked_features, &new_features, &map_points);
 
     // Marginalize old state.
-    if (marg_old_state) { MargOldestState(&state_); }
-
-    // [Debug]
-    for (size_t i = 0; i < state_.covariance.rows(); ++i) {
-        for (size_t j = 0; j < state_.covariance.cols(); ++j) {
-            if(std::abs(state_.covariance(i,j) - state_.covariance(j, i)) > 1e-12) {
-                exit(-1);
-            }
-        }
-    }
+    MargOldestState(&state_);
 
     /// Visualize.
     viz_->DrawWheelPose(state_.wheel_pose.G_R_O, state_.wheel_pose.G_p_O);

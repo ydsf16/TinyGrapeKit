@@ -1,8 +1,9 @@
 #include <Geometry/Triangulator.h>
-#include <Geometry/TriangulatorUtil.h>
 
 #include <Eigen/Dense>
 #include <glog/logging.h>
+
+#include <Geometry/TriangulatorUtil.h>
 
 namespace TGK {
 namespace Geometry {

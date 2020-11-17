@@ -4,6 +4,9 @@
 
 #include <TGK/Util/Util.h>
 
+#include <glog/logging.h>
+#include <iomanip>
+
 namespace VWO {
 
 void LeftNullspaceProjection(const Eigen::MatrixXd& Hx, 
@@ -38,6 +41,14 @@ void CompressMeasurement(const Eigen::MatrixXd& H,
     *r_cmp = Q1_trans * r;
 }
 
+void LimitMinDiagValue(const double min_diag_val, Eigen::MatrixXd* mat) {
+    for (size_t i = 0; i < mat->rows(); ++i) {
+        if ((*mat)(i, i) < min_diag_val) {
+            (*mat)(i, i) = min_diag_val;
+        }
+    }
+}
+
 void EKFUpdate(const Eigen::MatrixXd& H, 
                const Eigen::VectorXd& r, 
                const Eigen::MatrixXd& V,
@@ -57,6 +68,9 @@ void EKFUpdate(const Eigen::MatrixXd& H,
     // Update covariance.
     const Eigen::MatrixXd I_KH = Eigen::MatrixXd::Identity(state->covariance.rows(), state->covariance.rows()) - K * H;
     state->covariance = I_KH * P_minus * I_KH.transpose() + K * V * K.transpose();
+
+    state->covariance = state->covariance.eval().selfadjointView<Eigen::Upper>();
+    LimitMinDiagValue(1e-12, &state->covariance);
 }
 
 

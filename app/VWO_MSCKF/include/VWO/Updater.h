@@ -17,7 +17,8 @@ public:
     struct Config {
         double visual_noise = 1. * 1.; // 1 pixel std.
         double min_window_length = 3.;
-        int min_res_size = 50;
+        int min_used_points = 5;
+        int min_res_size = 10;
     };
 
     struct FeatureObservation {

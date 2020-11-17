@@ -74,10 +74,10 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
         features_obs.push_back(one_feature);
     }
     const int state_size = state->covariance.rows();
-    
+
     /// Triangulate points.
     map_points->clear();
-    map_points->reserve(lost_ft_ids_set.size());
+    map_points->reserve(features_obs.size());
     std::vector<FeatureObservation> features_full_obs;
     features_full_obs.reserve(features_obs.size());
     for (const std::vector<std::pair<Eigen::Vector2d, CameraFramePtr>>& one_ft_obs : features_obs) {
@@ -98,19 +98,17 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
         map_points->push_back(one_feaute.G_p);
     }
 
-    /// Compute Jacobian.
+    // Compute Jacobian.
     Eigen::MatrixXd H;
     Eigen::VectorXd r;
     ComputeVisualResidualJacobian(features_full_obs, state_size, &r, &H);
 
     const double window_length = (state->camera_frames.front()->G_p_C  - state->camera_frames.back()->G_p_C).norm();
     if (H.rows() > config_.min_res_size && window_length > config_.min_window_length) { 
-        /// Compress measurement.
+        // Compress measurement.
         Eigen::MatrixXd H_cmp;
         Eigen::VectorXd r_cmp;
         CompressMeasurement(H, r, &H_cmp, &r_cmp);
-
-        /// TODO: Chi2 test.
 
         /// EKF update.
         Eigen::MatrixXd V(H_cmp.rows(), H_cmp.rows());
@@ -128,9 +126,9 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, State* s
     big_plane_H.block<3, 6>(0, 0) = plane_H;
 
     Eigen::Matrix3d plane_noise = Eigen::Matrix3d::Identity();
-    plane_noise(0, 0) = 0.01;
-    plane_noise(1, 1) = 0.01;
-    plane_noise(2, 2) = 0.01;
+    plane_noise(0, 0) = 1.;
+    plane_noise(1, 1) = 1.;
+    plane_noise(2, 2) = 1.;
     EKFUpdate(big_plane_H, plane_res, plane_noise, state);
 
     // Remove use/lost features.
