@@ -28,6 +28,12 @@ void Visualizer::DrawFeatures(const std::vector<Eigen::Vector3d>& features) {
     while (features_.size() > config_.max_num_features) { features_.pop_front(); } 
 }
 
+void Visualizer::DrawColorImage(const cv::Mat& image) {
+    std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+    cv::resize(image, image_, cv::Size(config_.img_width, config_.img_heigh));
+    cv::flip(image_, image_, 0);
+}
+
 void Visualizer::DrawImage(const cv::Mat& image, 
                            const std::vector<Eigen::Vector2d>& tracked_fts, 
                            const std::vector<Eigen::Vector2d>& new_fts) {
@@ -195,7 +201,8 @@ void Visualizer::Run() {
     pangolin::OpenGlMatrix G_T_C;
     G_T_C.SetIdentity();
 
-    while (true) {
+    running_flag_ = true;
+    while (running_flag_) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         d_cam.Activate(s_cam);

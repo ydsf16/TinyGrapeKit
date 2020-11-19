@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <deque>
 #include <memory>
 #include <mutex>
@@ -31,6 +32,10 @@ public:
     };
 
     Visualizer(const Config& config);
+    ~Visualizer() {
+        running_flag_ = false;
+        viz_thread_->join();
+    }
 
     void DrawCameras(const std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>>& camera_poses);
 
@@ -38,6 +43,7 @@ public:
 
     void DrawFeatures(const std::vector<Eigen::Vector3d>& features);
 
+    void DrawColorImage(const cv::Mat& image);
     void DrawImage(const cv::Mat& image,
                    const std::vector<Eigen::Vector2d>& tracked_fts, 
                    const std::vector<Eigen::Vector2d>& new_fts);
@@ -56,6 +62,7 @@ private:
     
     // Thread.
     std::shared_ptr<std::thread> viz_thread_;
+    std::atomic<bool> running_flag_;
 
     // Data buffer.
     std::mutex data_buffer_mutex_;

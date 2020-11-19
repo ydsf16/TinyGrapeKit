@@ -55,3 +55,9 @@ target_link_libraries(RunRedBotData
     ${catkin_LIBRARIES}
     ${PROJECT_NAME} glog ${OpenCV_LIBS} TinyGrapeKit 
 )
+
+add_executable(TestVisualWheelCircleSim example/TestVisualWheelCircleSim.cpp)
+target_link_libraries(TestVisualWheelCircleSim
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME} glog ${OpenCV_LIBS} TinyGrapeKit 
+)

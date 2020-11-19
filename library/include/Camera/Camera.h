@@ -30,7 +30,10 @@ public:
         return InImage(I_p[0], I_p[1]);
     }
 
-protected:
+    inline int width() { return width_; }
+    inline int height() { return height_; }
+    
+protected: 
     int width_;
     int height_;
 };

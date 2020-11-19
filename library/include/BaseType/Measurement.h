@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include <Eigen/Core>
 #include <opencv2/opencv.hpp>
 
 namespace TGK {
@@ -38,6 +39,13 @@ struct MonoImageData : Measurement {
 };
 using MonoImageDataConstPtr = std::shared_ptr<const MonoImageData>;
 using MonoImageDataPtr = std::shared_ptr<MonoImageData>;
+
+struct SimMonoImageData : MonoImageData {
+    std::vector<Eigen::Vector2d> features;
+    std::vector<long int> feature_ids;
+};
+using SimMonoImageDataConstPtr = std::shared_ptr<const SimMonoImageData>;
+using SimMonoImageDataPtr = std::shared_ptr<SimMonoImageData>;
 
 }  // namespace BaseType
 }  // namespace TGK
