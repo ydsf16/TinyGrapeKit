@@ -101,6 +101,9 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
             = std::dynamic_pointer_cast<const TGK::BaseType::SimMonoImageData>(img_ptr);
         sim_feature_tracker_->TrackSimFrame(sim_img_ptr->features, sim_img_ptr->feature_ids, 
                                             &tracked_pts, &tracked_pt_ids, &lost_pt_ids, &new_pt_ids);
+    } else {
+        LOG(ERROR) << "Not surpport image type.";
+        exit(EXIT_FAILURE);
     }
 
     // Do not marginalize the last state if no enough camera state in the buffer.
@@ -118,7 +121,7 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
                           &state_, &tracked_features, &new_features, &map_points);
 
     // Marginalize old state.
-    MargOldestState(&state_);
+    if (marg_old_state) { MargOldestState(&state_); }
 
     /// Visualize.
     viz_->DrawWheelPose(state_.wheel_pose.G_R_O, state_.wheel_pose.G_p_O);

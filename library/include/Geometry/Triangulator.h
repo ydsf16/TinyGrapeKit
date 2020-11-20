@@ -8,9 +8,9 @@ namespace Geometry {
 class Triangulator {
 public:
     struct Config {
-        double max_proj_res = 2.;
-        double min_dist = 5.;
-        double max_dist = 60.;
+        double max_proj_res = 5.;
+        double min_dist = 0.1;
+        double max_dist = 100.;
     };
 
     Triangulator(const Camera::CameraPtr camera);

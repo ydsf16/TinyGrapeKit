@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 
     // Create the simulator.
     TGK::Simulation::VisualWheelCircleSim sim(camera, 
-        params.wheel_param.kl, params.wheel_param.kr, params.wheel_param.b,
+        params.wheel_param.kl, params.wheel_param.kr, params.wheel_param.b - 0.5,
         params.extrinsic.O_R_C, params.extrinsic.O_p_C);
 
     // Create VWO system.
