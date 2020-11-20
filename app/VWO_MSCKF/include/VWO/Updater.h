@@ -33,7 +33,12 @@ public:
             const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker,
             const std::shared_ptr<TGK::Geometry::Triangulator> triangulator);
 
-    void UpdateState(const cv::Mat& image, const bool marg_oldest, State* state, 
+    void UpdateState(const cv::Mat& image, const bool marg_oldest, 
+                     const std::vector<Eigen::Vector2d>& tracked_pts, 
+                     const std::vector<long int>& tracked_pt_ids,
+                     const std::vector<long int>& lost_pt_ids,
+                     const std::set<long int>& new_pt_ids,
+                     State* state, 
                      std::vector<Eigen::Vector2d>* all_features,
                      std::vector<Eigen::Vector2d>* new_features,
                      std::vector<Eigen::Vector3d>* map_points);

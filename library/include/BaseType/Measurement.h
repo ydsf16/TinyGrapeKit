@@ -11,18 +11,22 @@ namespace BaseType {
 enum class MeasureType {
     kUnknown,
     kWheel,
-    kMonoImage
+    kMonoImage,
+    kSimMonoImage
 };
 
 struct Measurement {
+    virtual ~Measurement() { }
+
     double timestamp;
     MeasureType type;
 };
 
-struct WheelData : Measurement {
+struct WheelData : public Measurement {
     WheelData() { 
         type = MeasureType::kWheel;
     }
+    ~WheelData() override = default;
     
     double left;
     double right;
@@ -30,17 +34,23 @@ struct WheelData : Measurement {
 using WheelDataConstPtr = std::shared_ptr<const WheelData>;
 using WheelDataPtr = std::shared_ptr<WheelData>;
 
-struct MonoImageData : Measurement {
+struct MonoImageData : public Measurement {
     MonoImageData() {
         type = MeasureType::kMonoImage;
     }
+    virtual ~MonoImageData() override { }
 
     cv::Mat image;
 };
 using MonoImageDataConstPtr = std::shared_ptr<const MonoImageData>;
 using MonoImageDataPtr = std::shared_ptr<MonoImageData>;
 
-struct SimMonoImageData : MonoImageData {
+struct SimMonoImageData : public MonoImageData {
+    SimMonoImageData() {
+        type = MeasureType::kSimMonoImage;
+    }
+    ~SimMonoImageData() override = default;
+
     std::vector<Eigen::Vector2d> features;
     std::vector<long int> feature_ids;
 };

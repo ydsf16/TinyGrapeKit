@@ -9,6 +9,8 @@
 #include <TGK/Camera/Camera.h>
 #include <TGK/DataSynchronizer/WheelImageSynchronizer.h>
 #include <TGK/Geometry/Triangulator.h>
+#include <TGK/ImageProcessor/FeatureTracker.h>
+#include <TGK/ImageProcessor/SimFeatureTracker.h>
 
 #include <VWO/Initializer.h>
 #include <VWO/Parameter.h>
@@ -31,9 +33,12 @@ public:
 
     bool FeedImageData(const double timestamp, const cv::Mat& image);
 
+    bool FeedSimData(const double timestamp, const cv::Mat& image, 
+                     const std::vector<Eigen::Vector2d>& features,
+                     const std::vector<long int>& feature_ids);
+
 private:
     std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> GetCameraPoses();
-
 
     Config config_;
     std::shared_ptr<TGK::Camera::Camera> camera_;
@@ -42,6 +47,9 @@ private:
     std::unique_ptr<Visualizer> viz_;
     std::unique_ptr<Propagator> propagator_;
     std::unique_ptr<Updater> updater_;
+    std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker_;
+    std::shared_ptr<TGK::ImageProcessor::SimFeatureTrakcer> sim_feature_tracker_; 
+
     bool initialized_;
     Parameter param_;
 

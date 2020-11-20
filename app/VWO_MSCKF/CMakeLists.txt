@@ -61,3 +61,9 @@ target_link_libraries(TestVisualWheelCircleSim
     ${catkin_LIBRARIES}
     ${PROJECT_NAME} glog ${OpenCV_LIBS} TinyGrapeKit 
 )
+
+add_executable(RunCircleSimData example/RunCircleSimData.cpp)
+target_link_libraries(RunCircleSimData
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME} glog ${OpenCV_LIBS} TinyGrapeKit 
+)

@@ -17,6 +17,7 @@ void SimFeatureTrakcer::TrackSimFrame(const std::vector<Eigen::Vector2d>& sim_fe
     *tracked_pt_ids = sim_feature_ids;
 
     if (lost_pt_ids != nullptr) {
+        lost_pt_ids->clear();
         const std::unordered_set<long int> cur_ids_set(sim_feature_ids.begin(), sim_feature_ids.end());
         for (const auto& last_id_ft : last_features_) {
             const long int last_ft_id = last_id_ft.first;
@@ -27,6 +28,7 @@ void SimFeatureTrakcer::TrackSimFrame(const std::vector<Eigen::Vector2d>& sim_fe
     }
 
     if (new_pt_ids != nullptr) {
+        new_pt_ids->clear();
         for (const long int cur_ft_id : sim_feature_ids) {
             if (last_features_.find(cur_ft_id) == last_features_.end()) {
                 new_pt_ids->insert(cur_ft_id);

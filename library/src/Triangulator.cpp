@@ -61,13 +61,13 @@ bool Triangulator::Triangulate(const std::vector<Eigen::Matrix3d>& G_R_Cs,
 
         Eigen::Vector2d exp_I_p;
         if (!camera_->CameraToImage(C_p, &exp_I_p)) {
-            // LOG(WARNING) << "[Triangulate]: Failed to project refined triangulated point to image.";
+            LOG(WARNING) << "[Triangulate]: Failed to project refined triangulated point to image.";
             return false;
         }
 
         const double error = (im_pts[i] - exp_I_p).norm();
         if (error > config_.max_proj_res) {
-            // LOG(WARNING) << "[Triangulate]: Too large projection error: " << std::fixed << error;
+            LOG(WARNING) << "[Triangulate]: Too large projection error: " << std::fixed << error;
             return false;
         }
     }
