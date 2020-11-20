@@ -163,6 +163,10 @@ bool VWOSystem::FeedSimData(const double timestamp, const cv::Mat& image,
     return true;
 }
 
+void VWOSystem::FeedGroundTruth(const double timestamp, const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O) {
+    viz_->DrawGroundTruth(G_R_O, G_p_O);
+}
+
 std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> VWOSystem::GetCameraPoses() {
     std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> cam_poses;
     cam_poses.clear();

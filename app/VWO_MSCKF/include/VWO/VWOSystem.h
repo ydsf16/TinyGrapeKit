@@ -36,6 +36,8 @@ public:
     bool FeedSimData(const double timestamp, const cv::Mat& image, 
                      const std::vector<Eigen::Vector2d>& features,
                      const std::vector<long int>& feature_ids);
+                     
+    void FeedGroundTruth(const double timestamp, const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O);
 
 private:
     std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> GetCameraPoses();

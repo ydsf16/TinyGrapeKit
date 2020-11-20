@@ -48,12 +48,14 @@ public:
                    const std::vector<Eigen::Vector2d>& tracked_fts, 
                    const std::vector<Eigen::Vector2d>& new_fts);
 
+    void DrawGroundTruth(const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O);
+
 private:
     void Run();
 
     void DrawOneCamera(const Eigen::Matrix3d& G_R_C, const Eigen::Vector3d& G_p_C);
     void DrawCameras();
-    void DrawTraj();
+    void DrawTraj(const std::deque<std::pair<Eigen::Matrix3d, Eigen::Vector3d>>& traj_data);
     void DrawFeatures();
     void DrawWheeFrame(const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O);
     void DrawWheeFrame();
@@ -68,6 +70,7 @@ private:
     std::mutex data_buffer_mutex_;
     std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> camera_poses_;
     std::deque<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> wheel_traj_;
+    std::deque<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> gt_wheel_traj_;
     std::deque<Eigen::Vector3d> features_;
 
     cv::Mat image_;

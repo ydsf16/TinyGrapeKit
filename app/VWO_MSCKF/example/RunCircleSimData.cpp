@@ -39,6 +39,9 @@ int main(int argc, char** argv) {
 
     int cnt = 0;
     constexpr int kSkipCnt = 10;
+    Eigen::Matrix3d init_gt_G_R_O;
+    Eigen::Vector3d init_gt_G_p_O;
+    bool init_flag = false;
 
     double timestamp;
     Eigen::Matrix3d G_R_O;
@@ -47,10 +50,19 @@ int main(int argc, char** argv) {
     std::vector<Eigen::Vector2d> features;
     std::vector<long int> feature_ids;
     cv::Mat image;
+    
     while (sim.SimOneFrame(&timestamp, &G_R_O, &G_p_O, &left_wheel, &right_wheel, &features, &feature_ids, &image)) {
-        // const Eigen::Vector2d rand_wheel = Eigen::Vector2d::Random() * 50.;
         vwo_sys.FeedWheelData(timestamp, left_wheel, right_wheel);
         
+        if (init_flag == false) {
+            init_gt_G_R_O = G_R_O;
+            init_gt_G_p_O = G_p_O;
+            init_flag = true;
+        }
+        G_R_O = init_gt_G_R_O.transpose() * G_R_O.eval();
+        G_p_O = init_gt_G_R_O.transpose() * (G_p_O.eval() - init_gt_G_p_O);
+        vwo_sys.FeedGroundTruth(timestamp, G_R_O, G_p_O);
+
         if (++cnt <= kSkipCnt) { continue; }
         cnt = 0;
         vwo_sys.FeedSimData(timestamp, image, features, feature_ids);

@@ -20,6 +20,12 @@ void Visualizer::DrawWheelPose(const Eigen::Matrix3d& G_R_O, const Eigen::Vector
     if (wheel_traj_.size() > config_.max_traj_length) { wheel_traj_.pop_front(); }
 }
 
+void Visualizer::DrawGroundTruth(const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O) {
+    std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+    gt_wheel_traj_.emplace_back(G_R_O, G_p_O);
+    if (gt_wheel_traj_.size() > config_.max_traj_length) { gt_wheel_traj_.pop_front(); }
+}
+
 void Visualizer::DrawFeatures(const std::vector<Eigen::Vector3d>& features) {
     std::lock_guard<std::mutex> lg(data_buffer_mutex_);
     for (const Eigen::Vector3d& ft : features) {
@@ -131,12 +137,12 @@ void Visualizer::DrawCameras() {
     }
 }
 
-void Visualizer::DrawTraj() {
+void Visualizer::DrawTraj(const std::deque<std::pair<Eigen::Matrix3d, Eigen::Vector3d>>& traj_data) {
     glLineWidth(config_.cam_line_width);
     glBegin(GL_LINE_STRIP);
 
     std::lock_guard<std::mutex> lg(data_buffer_mutex_);
-    for (const auto& wheel_pose : wheel_traj_) {
+    for (const auto& wheel_pose : traj_data) {
         const Eigen::Vector3d& G_p_O = wheel_pose.second;
         glVertex3f(G_p_O[0], G_p_O[1], G_p_O[2]);
     }
@@ -223,8 +229,12 @@ void Visualizer::Run() {
 
         // Draw wheel traj.
         glColor3f(1.0f, 0.0f, 0.0f);
-        DrawTraj();
+        DrawTraj(wheel_traj_);
         DrawWheeFrame();
+
+        // Draw gt wheel traj.
+        glColor3f(0.0f, 1.0f, 0.0f);
+        DrawTraj(gt_wheel_traj_);
 
         // Draw camera poses.
         glColor3f(0.0f, 1.0f, 0.0f);
