@@ -38,23 +38,19 @@ void WheelPropagator::PropagateUsingEncoder(const double begin_wl, const double 
 
     // Covariance.
     if (cov != nullptr && J_wrt_pose != nullptr) {
-        Eigen::Matrix<double, 6, 2> J_wrt_lr_dist;
-        J_wrt_lr_dist << Eigen::Vector3d(0., 0., -1. / b_),         Eigen::Vector3d(0., 0., 1. / b_),
-                         old_G_R_O * Eigen::Vector3d(0.5, 0., 0.), old_G_R_O * Eigen::Vector3d(0.5, 0., 0.);
-        
-        const double left_noise_std = left_dist * noise_factor_;
-        const double right_noise_std = right_dist * noise_factor_;
-        const Eigen::Matrix2d dist_noise = 
-            (Eigen::Matrix2d() << left_noise_std * left_noise_std, 0., 
-                                  0.,                              right_noise_std * right_noise_std).finished();
+        Eigen::Matrix<double, 6, 6> noise = Eigen::Matrix<double, 6, 6>::Zero();
+        noise(0, 0) = roll_pitch_noise_;
+        noise(1, 1) = roll_pitch_noise_;
+        noise(2, 2) = delta_yaw * delta_yaw * noise_factor_ * noise_factor_;
+        noise(3, 3) = delta_dist * delta_dist * noise_factor_ * noise_factor_;
+        noise(4, 4) = delta_dist * delta_dist * noise_factor_ * noise_factor_;
+        noise(5, 5) = z_noise_;
+
+        Eigen::Matrix<double, 6, 6> J_wrt_delta_pose = Eigen::Matrix<double, 6, 6>::Identity();
+        J_wrt_delta_pose.block<3, 3>(3, 3) = old_G_R_O;
 
         *cov = (*J_wrt_pose) * cov->eval() * J_wrt_pose->transpose() + 
-               J_wrt_lr_dist * dist_noise * J_wrt_lr_dist.transpose();
-
-        // Additive noise for roll pitch and　z.
-        (*cov)(0, 0) += roll_pitch_noise_;
-        (*cov)(1, 1) += roll_pitch_noise_;
-        (*cov)(2, 2) += z_noise_;
+               J_wrt_delta_pose * noise * J_wrt_delta_pose.transpose();
     }
 }
 
