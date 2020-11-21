@@ -23,8 +23,14 @@ For details, please refer to: TODO
 ![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/VWO_MSCKF/doc/KAIST.png)
 ![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/VWO_MSCKF/doc/SIM.png)
 
+### Dataset 
 We used the KAIST dataset to test our method. https://irap.kaist.ac.kr/dataset/
 
+### Example
+For examples, please refer to the **Example** folder.
+```
+./RunKAISTData ${REPO_PATH}/TinyGrapeKit/app/VWO_MSCKF/params/KAIST.yaml ${KAIST_PATH}
+```
 
 # Contact us
 For any issues, please feel free to contact **[Dongsheng Yang](https://github.com/ydsf16)**: <ydsf16@buaa.edu.cn>, <ydsf16@163.com>
