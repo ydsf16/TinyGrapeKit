@@ -36,9 +36,7 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    FLAGS_minloglevel = 0;
-    FLAGS_colorlogtostderr = true;
-
+    FLAGS_minloglevel = 3;
     const std::string param_file = argv[1];
     const std::string data_folder = argv[2];
 

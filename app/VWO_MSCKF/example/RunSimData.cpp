@@ -12,8 +12,7 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    FLAGS_minloglevel = 0;
-    FLAGS_colorlogtostderr = true;
+    FLAGS_minloglevel = 3;
     const std::string param_file = argv[1];
 
     VWO::Parameter params;
@@ -72,6 +71,8 @@ int main(int argc, char** argv) {
         }
         
         vwo_sys.FeedSimData(timestamp, image, features, feature_ids);
+
+        usleep(1e4);
     }
     
     std::cin.ignore();

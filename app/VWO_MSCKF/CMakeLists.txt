@@ -22,9 +22,9 @@ include_directories(${TGK_DIR}/include/TGK)
 link_directories(${TGK_DIR}/lib)
 
 # Pangolin
-#set(Pangolin_DIR ${CMAKE_SOURCE_DIR}/../../../third_party/Pangolin)
-#include_directories(${Pangolin_DIR}/include)
-#link_directories(${Pangolin_DIR}/include/build/src)
+set(Pangolin_DIR ${CMAKE_SOURCE_DIR}/../../third_party/Pangolin)
+include_directories(${Pangolin_DIR}/include)
+link_directories(${Pangolin_DIR}/build/src)
 
 # Make library
 file(GLOB_RECURSE ALL_HEADER_FILES
@@ -42,16 +42,8 @@ target_link_libraries(${PROJECT_NAME} TinyGrapeKit pangolin)
 add_executable(RunKAISTData example/RunKAISTData.cpp)
 target_link_libraries(RunKAISTData glog ${OpenCV_LIBS} TinyGrapeKit ${PROJECT_NAME})
 
-# ROS Interface
-find_package(catkin REQUIRED COMPONENTS
-    sensor_msgs
-    rosbag
-    cv_bridge
-)
-include_directories(${catkin_INCLUDE_DIRS})
-
-add_executable(RunRedBotData example/RunRedBotData.cpp)
-target_link_libraries(RunRedBotData
+add_executable(RunSimData example/RunSimData.cpp)
+target_link_libraries(RunSimData
     ${catkin_LIBRARIES}
     ${PROJECT_NAME} glog ${OpenCV_LIBS} TinyGrapeKit 
 )
@@ -62,8 +54,4 @@ target_link_libraries(TestVisualWheelCircleSim
     ${PROJECT_NAME} glog ${OpenCV_LIBS} TinyGrapeKit 
 )
 
-add_executable(RunCircleSimData example/RunCircleSimData.cpp)
-target_link_libraries(RunCircleSimData
-    ${catkin_LIBRARIES}
-    ${PROJECT_NAME} glog ${OpenCV_LIBS} TinyGrapeKit 
-)
+
