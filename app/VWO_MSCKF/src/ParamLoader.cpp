@@ -67,7 +67,7 @@ void LoadParam(const std::string& param_file, Parameter* params) {
     // Updater
     params->updater_config.visual_noise = cv_params["updater.visual_noise"];
     params->updater_config.min_window_length = cv_params["updater.min_window_length"];
-    params->updater_config.min_used_points = cv_params["updater.min_used_points"];
+    params->updater_config.min_cam_dist_to_triangulate = cv_params["updater.min_cam_dist_to_triangulate"];
     params->updater_config.min_res_size = cv_params["updater.min_res_size"];
     params->updater_config.plane_rot_noise = cv_params["updater.plane_rot_noise"];
     params->updater_config.plane_trans_noise = cv_params["updater.plane_trans_noise"];

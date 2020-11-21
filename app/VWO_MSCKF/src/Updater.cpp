@@ -91,6 +91,12 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest,
             one_feaute.camera_frame.push_back(one_obs.second);
         }
 
+        // Check camera distance.
+        if ((one_feaute.camera_frame.front()->G_p_C - one_feaute.camera_frame.back()->G_p_C).norm() < 
+            config_.min_cam_dist_to_triangulate) {
+            continue;
+        }
+
         if (!triangulator_->Triangulate(G_R_Cs, G_p_Cs, one_feaute.im_pts, &one_feaute.G_p)) { continue; }
         features_full_obs.push_back(one_feaute);
         map_points->push_back(one_feaute.G_p);

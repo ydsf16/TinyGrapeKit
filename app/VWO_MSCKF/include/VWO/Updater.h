@@ -17,8 +17,8 @@ public:
     struct Config {
         double visual_noise = 1. * 1.; // 1 pixel std.
         double min_window_length = 3.;
-        int min_used_points = 5;
         int min_res_size = 10;
+        double min_cam_dist_to_triangulate = 0.2;
 
         double plane_rot_noise = 0.01;
         double plane_trans_noise = 0.01;

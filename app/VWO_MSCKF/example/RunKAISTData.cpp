@@ -109,5 +109,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    std::cin.ignore();
+
     return EXIT_SUCCESS;
 }
