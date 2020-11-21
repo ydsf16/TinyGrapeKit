@@ -54,7 +54,7 @@ viz_config.max_traj_length: 100000
 viz_config.max_num_features: 5000
 
 # Triangulator
-tri_config.max_proj_res: 2.
+tri_config.max_proj_res: 5.
 tri_config.min_dist: 0.1
 tri_config.max_dist: 100.
 
