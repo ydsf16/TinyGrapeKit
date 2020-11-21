@@ -18,7 +18,7 @@ chmod +x build.sh
 ## VWO-MSCKF : MSCKF Based Visual Wheel Odometry. 
 An odometry algorithm by fusing visual and wheel information in an Extended Kalman Filter.
 
-For details, please refer to: TODO
+For details, please refer to: https://zhuanlan.zhihu.com/p/270670373
 
 ![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/VWO_MSCKF/doc/KAIST.png)
 ![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/VWO_MSCKF/doc/SIM.png)
