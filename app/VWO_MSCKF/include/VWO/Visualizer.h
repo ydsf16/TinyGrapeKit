@@ -50,6 +50,8 @@ public:
 
     void DrawGroundTruth(const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O);
 
+    void DrawWheelOdom(const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O);
+
 private:
     void Run();
 
@@ -71,6 +73,7 @@ private:
     std::vector<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> camera_poses_;
     std::deque<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> wheel_traj_;
     std::deque<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> gt_wheel_traj_;
+    std::deque<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> wheel_odom_traj_;
     std::deque<Eigen::Vector3d> features_;
 
     cv::Mat image_;

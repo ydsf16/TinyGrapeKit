@@ -26,6 +26,12 @@ void Visualizer::DrawGroundTruth(const Eigen::Matrix3d& G_R_O, const Eigen::Vect
     if (gt_wheel_traj_.size() > config_.max_traj_length) { gt_wheel_traj_.pop_front(); }
 }
 
+void Visualizer::DrawWheelOdom(const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O) {
+    std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+    wheel_odom_traj_.emplace_back(G_R_O, G_p_O);
+    if (wheel_odom_traj_.size() > config_.max_traj_length) { wheel_odom_traj_.pop_front(); }
+}
+
 void Visualizer::DrawFeatures(const std::vector<Eigen::Vector3d>& features) {
     std::lock_guard<std::mutex> lg(data_buffer_mutex_);
     for (const Eigen::Vector3d& ft : features) {
@@ -235,6 +241,10 @@ void Visualizer::Run() {
         // Draw gt wheel traj.
         glColor3f(0.0f, 1.0f, 0.0f);
         DrawTraj(gt_wheel_traj_);
+
+        // Draw raw odometry.
+        glColor3f(0.0f, 0.0f, 1.0f);
+        DrawTraj(wheel_odom_traj_);
 
         // Draw camera poses.
         glColor3f(0.0f, 1.0f, 0.0f);

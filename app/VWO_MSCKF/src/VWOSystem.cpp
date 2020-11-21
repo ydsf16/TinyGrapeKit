@@ -15,7 +15,8 @@ namespace VWO {
 
 long int VWOSystem::kFrameId = -1;
 
-VWOSystem::VWOSystem(const std::string& param_file) : initialized_(false) {
+VWOSystem::VWOSystem(const std::string& param_file) 
+    : initialized_(false), odom_G_R_O_(Eigen::Matrix3d::Identity()), odom_G_p_O_(Eigen::Vector3d::Zero()) {
     /// Load parameters.
     LoadParam(param_file, &param_);
 
@@ -46,6 +47,11 @@ VWOSystem::VWOSystem(const std::string& param_file) : initialized_(false) {
     updater_ = std::make_unique<Updater>(updater_config, camera_, feature_tracker_, triangulator);
 
     viz_ = std::make_unique<Visualizer>(param_.viz_config);
+
+    if (config_.compute_raw_odom_) {
+        wheel_propagator_ = std::make_unique<TGK::WheelProcessor::WheelPropagator>(
+            param_.wheel_param.kl, param_.wheel_param.kr, param_.wheel_param.b);
+    }
 }
 
 bool VWOSystem::FeedWheelData(const double timestamp, const double left, const double right) {
@@ -83,6 +89,13 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
 
         // Set timestamp.
         state_.timestamp = end_wheel->timestamp;
+        
+        // Compute raw wheel odometry for comparison with vwo-msckf.
+        if (wheel_propagator_  != nullptr) {
+            wheel_propagator_->PropagateUsingEncoder(begin_wheel->left, begin_wheel->right, 
+                                                     end_wheel->left, end_wheel->right, 
+                                                     &odom_G_R_O_, &odom_G_p_O_);
+        }
     }
 
     // Augment state / Clone new camera state.
@@ -108,10 +121,7 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
 
     // Do not marginalize the last state if no enough camera state in the buffer.
     const bool marg_old_state = state_.camera_frames.size() >= config_.sliding_window_size;
-    if (!marg_old_state) {
-        return true;
-    }
-    
+
     // Update state.
     std::vector<Eigen::Vector2d> tracked_features;
     std::vector<Eigen::Vector2d> new_features;
@@ -132,6 +142,11 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
         viz_->DrawImage(img_ptr->image, tracked_features, new_features);
     } else if (image_type == TGK::BaseType::MeasureType::kSimMonoImage) {
         viz_->DrawColorImage(img_ptr->image);
+    }
+
+    // Draw raw wheel odometry.
+    if (config_.compute_raw_odom_) {
+        viz_->DrawWheelOdom(odom_G_R_O_, odom_G_p_O_);
     }
 
     return true;

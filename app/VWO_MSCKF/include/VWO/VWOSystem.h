@@ -25,6 +25,7 @@ class VWOSystem {
 public:
     struct Config {
         int sliding_window_size = 10;
+        bool compute_raw_odom_ =  true;
     };
 
     VWOSystem(const std::string& param_file);
@@ -58,6 +59,11 @@ private:
     State state_;
 
     static long int kFrameId;
+
+    // Raw wheel Odometry, just for comparison.
+    Eigen::Matrix3d odom_G_R_O_;
+    Eigen::Vector3d odom_G_p_O_;
+    std::unique_ptr<TGK::WheelProcessor::WheelPropagator> wheel_propagator_;
 };
 
 }  // namespace VWO
