@@ -1,5 +1,5 @@
 # TinyGrapeKit
-## A repositorie for state estimation.
+## A bunch of state estimation algorithms.
 This repo is divided into two parts, one is the basic algorithm, in the **library** folder. The other is the actual multi-sensor fusion algorithm (e.g. SLAM), in the **app** folder.
 
 Detailed derivations can be found in: https://www.zhihu.com/column/slamTech
