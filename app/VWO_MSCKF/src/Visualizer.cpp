@@ -192,9 +192,12 @@ void Visualizer::Run() {
 
     pangolin::Var<bool> menu_follow_cam("menu.Follow Camera", true, true);
     pangolin::Var<int> grid_scale("menu.Grid Size (m)", 100, 1, 500);
-    pangolin::Var<bool> draw_grid("menu.Draw Grid", true, true);
-    pangolin::Var<bool> draw_map("menu.Draw Map", true, true);
-    pangolin::Var<bool> draw_cam("menu.Draw Camera", true, true);
+    pangolin::Var<bool> show_grid("menu.Show Grid", true, true);
+    pangolin::Var<bool> show_map("menu.Show Map", true, true);
+    pangolin::Var<bool> show_cam("menu.Show Camera", true, true);
+    pangolin::Var<bool> show_traj("menu.Show Traj", true, true);
+    pangolin::Var<bool> show_gt_traj("menu.Show GroundTruth", true, true);
+    pangolin::Var<bool> show_raw_odom("menu.Show Raw Odom", true, true);
 
     // Define Camera Render Object (for view / scene browsing)
     pangolin::OpenGlRenderState s_cam(
@@ -230,32 +233,38 @@ void Visualizer::Run() {
         }
 
         // Draw grid.
-        if (draw_grid.Get()) {
+        if (show_grid.Get()) {
             glColor3f(0.3f, 0.3f, 0.3f);
             pangolin::glDraw_z0(grid_scale, 1000);
         }
 
         // Draw wheel traj.
-        glColor3f(1.0f, 0.0f, 0.0f);
-        DrawTraj(wheel_traj_);
-        DrawWheeFrame();
+        if (show_traj.Get()) {
+            glColor3f(1.0f, 0.0f, 0.0f);
+            DrawTraj(wheel_traj_);
+            DrawWheeFrame();
+        }
 
         // Draw gt wheel traj.
-        glColor3f(0.0f, 1.0f, 0.0f);
-        DrawTraj(gt_wheel_traj_);
+        if (show_gt_traj.Get()) {
+            glColor3f(0.0f, 1.0f, 0.0f);
+            DrawTraj(gt_wheel_traj_);
+        }
 
         // Draw raw odometry.
-        glColor3f(1.0f, 0.0f, 1.0f);
-        DrawTraj(wheel_odom_traj_);
+        if (show_raw_odom.Get()) {
+            glColor3f(1.0f, 0.0f, 1.0f);
+            DrawTraj(wheel_odom_traj_);
+        }
 
         // Draw camera poses.
-        if (draw_cam.Get()) {
+        if (show_cam.Get()) {
             glColor3f(0.0f, 1.0f, 0.0f);
             DrawCameras();
         }
 
         // Draw map points.
-        if (draw_map.Get()) {
+        if (show_map.Get()) {
             glColor3f(0.0f, 0.0f, 1.0f);
             DrawFeatures();
         }
