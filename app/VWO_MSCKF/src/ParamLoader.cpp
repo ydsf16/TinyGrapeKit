@@ -54,7 +54,6 @@ void LoadParam(const std::string& param_file, Parameter* params) {
     params->viz_config.max_traj_length = cv_params["viz_config.max_traj_length"];
     params->viz_config.max_num_features = cv_params["viz_config.max_num_features"];
 
-
     // Triangulator
     params->tri_config.max_proj_res = cv_params["tri_config.max_proj_res"];
     params->tri_config.min_dist = cv_params["tri_config.min_dist"];
@@ -77,8 +76,8 @@ void LoadParam(const std::string& param_file, Parameter* params) {
     params->updater_config.plane_trans_noise = cv_params["updater.plane_trans_noise"];
 
     // System config.
-    params->sys_config.sliding_window_size = cv_params["updater.sliding_window_size"];
-    cv_params["updater.compute_raw_odom"] >> params->sys_config.compute_raw_odom;
+    params->sys_config.sliding_window_size = cv_params["sys_config.sliding_window_size"];
+    cv_params["sys_config.compute_raw_odom"] >> params->sys_config.compute_raw_odom;
 }
 
 }  // namespace VWO
