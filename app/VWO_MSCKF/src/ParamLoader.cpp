@@ -60,12 +60,9 @@ void LoadParam(const std::string& param_file, Parameter* params) {
     params->tri_config.max_dist = cv_params["tri_config.max_dist"];
 
     // Feature tracker
-    params->tracker_config.num_pts = cv_params["tracker_config.num_pts"];
-    params->tracker_config.fast_th = cv_params["tracker_config.fast_th"];
-    params->tracker_config.grid_x = cv_params["tracker_config.grid_x"];
-    params->tracker_config.grid_y = cv_params["tracker_config.grid_y"];
-    params->tracker_config.max_px_dist = cv_params["tracker_config.max_px_dist"];
-    cv_params["tracker_config.use_klt"] >> params->tracker_config.use_klt;
+    params->tracker_config.max_num_corners = cv_params["tracker_config.max_num_corners"];
+    params->tracker_config.quality_level = cv_params["tracker_config.quality_level"];
+    params->tracker_config.min_dist = cv_params["tracker_config.min_dist"];
 
     // Updater
     params->updater_config.visual_noise = cv_params["updater.visual_noise"];

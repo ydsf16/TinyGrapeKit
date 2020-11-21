@@ -6,8 +6,6 @@
 #include <TGK/Camera/PinholeRanTanCamera.h>
 #include <TGK/Geometry/Triangulator.h>
 #include <TGK/ImageProcessor/KLTFeatureTracker.h>
-#include <TGK/ImageProcessor/ORBFeatureTracker.h>
-#include <TGK/ImageProcessor/OpenVinsTracker.h>
 #include <VWO/ParamLoader.h>
 #include <VWO/StateAugmentor.h>
 #include <VWO/StateMarginalizer.h>
@@ -50,7 +48,7 @@ VWOSystem::VWOSystem(const std::string& param_file)
                   param_.cam_intrinsic.k1, param_.cam_intrinsic.k2,
                   param_.cam_intrinsic.p1, param_.cam_intrinsic.p2;
 
-    feature_tracker_ = std::make_shared<TGK::ImageProcessor::OpenVinsTracker>(param_.tracker_config, cam_intrin);
+    feature_tracker_ = std::make_shared<TGK::ImageProcessor::KLTFeatureTracker>(param_.tracker_config);
     sim_feature_tracker_ = std::make_shared<TGK::ImageProcessor::SimFeatureTrakcer>();  
 
     updater_ = std::make_unique<Updater>(param_.updater_config, camera_, feature_tracker_, triangulator);

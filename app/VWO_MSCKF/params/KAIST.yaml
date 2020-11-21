@@ -59,15 +59,12 @@ tri_config.min_dist: 0.1
 tri_config.max_dist: 100.
 
 # FeatureTracker
-tracker_config.num_pts: 200
-tracker_config.fast_th: 10
-tracker_config.grid_x: 10
-tracker_config.grid_y: 5
-tracker_config.max_px_dist: 9
-tracker_config.use_klt: true
+tracker_config.max_num_corners: 200
+tracker_config.quality_level: 0.01
+tracker_config.min_dist: 40
 
 # Updater
-updater.visual_noise: 1.
+updater.visual_noise: 0.25
 updater.min_window_length: 1.
 updater.min_used_points: 3
 updater.min_res_size: 4

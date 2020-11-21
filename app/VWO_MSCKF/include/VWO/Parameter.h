@@ -5,7 +5,7 @@
 #include <VWO/Visualizer.h>
 #include <VWO/Updater.h>
 #include <TGK/Geometry/Triangulator.h>
-#include <TGK/ImageProcessor/OpenVinsTracker.h>
+#include <TGK/ImageProcessor/KLTFeatureTracker.h>
 
 namespace VWO {
 
@@ -53,7 +53,7 @@ struct Parameter {
 
     Visualizer::Config viz_config;
     TGK::Geometry::Triangulator::Config tri_config;
-    TGK::ImageProcessor::OpenVinsTracker::Config tracker_config;
+    TGK::ImageProcessor::KLTFeatureTracker::Config tracker_config;
     Updater::Config updater_config;
 
     SysConfig sys_config;
