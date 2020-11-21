@@ -22,9 +22,9 @@ include_directories(${TGK_DIR}/include/TGK)
 link_directories(${TGK_DIR}/lib)
 
 # Pangolin
-set(Pangolin_DIR ${CMAKE_SOURCE_DIR}/../../../third_party/Pangolin)
-include_directories(${Pangolin_DIR}/include)
-link_directories(${Pangolin_DIR}/include/build/src)
+#set(Pangolin_DIR ${CMAKE_SOURCE_DIR}/../../../third_party/Pangolin)
+#include_directories(${Pangolin_DIR}/include)
+#link_directories(${Pangolin_DIR}/include/build/src)
 
 # Make library
 file(GLOB_RECURSE ALL_HEADER_FILES

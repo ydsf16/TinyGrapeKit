@@ -7,6 +7,7 @@
 #include <TGK/Geometry/Triangulator.h>
 #include <TGK/ImageProcessor/KLTFeatureTracker.h>
 #include <TGK/ImageProcessor/ORBFeatureTracker.h>
+#include <TGK/ImageProcessor/OpenVinsTracker.h>
 #include <VWO/ParamLoader.h>
 #include <VWO/StateAugmentor.h>
 #include <VWO/StateMarginalizer.h>
@@ -29,11 +30,6 @@ VWOSystem::VWOSystem(const std::string& param_file)
     propagator_ = std::make_unique<Propagator>(param_.wheel_param.kl, param_.wheel_param.kr, param_.wheel_param.b, 
                                                param_.wheel_param.noise_factor);
 
-    // Create feature tracker.
-    feature_tracker_ = std::make_shared<TGK::ImageProcessor::KLTFeatureTracker>(
-        TGK::ImageProcessor::KLTFeatureTracker::Config());
-    sim_feature_tracker_ = std::make_shared<TGK::ImageProcessor::SimFeatureTrakcer>();  
-
     camera_ = std::make_shared<TGK::Camera::PinholeRadTanCamera>(
         param_.cam_intrinsic.width, param_.cam_intrinsic.height,
         param_.cam_intrinsic.fx, param_.cam_intrinsic.fy,
@@ -42,7 +38,20 @@ VWOSystem::VWOSystem(const std::string& param_file)
         param_.cam_intrinsic.p1, param_.cam_intrinsic.p2,
         param_.cam_intrinsic.k3);
 
+    
     const auto triangulator = std::make_shared<TGK::Geometry::Triangulator>(camera_);
+
+    // Create feature tracker.
+    Eigen::Matrix<double, 8, 1> cam_intrin;
+    cam_intrin << param_.cam_intrinsic.fx, param_.cam_intrinsic.fy,
+                  param_.cam_intrinsic.cx, param_.cam_intrinsic.cy,
+                  param_.cam_intrinsic.k1, param_.cam_intrinsic.k2,
+                  param_.cam_intrinsic.p1, param_.cam_intrinsic.p2;
+
+    feature_tracker_ = std::make_shared<TGK::ImageProcessor::OpenVinsTracker>(
+        TGK::ImageProcessor::OpenVinsTracker::Config(), cam_intrin);
+    sim_feature_tracker_ = std::make_shared<TGK::ImageProcessor::SimFeatureTrakcer>();  
+
     Updater::Config updater_config;
     updater_ = std::make_unique<Updater>(updater_config, camera_, feature_tracker_, triangulator);
 

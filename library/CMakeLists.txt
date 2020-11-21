@@ -17,6 +17,12 @@ include_directories(${OpenCV_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS}/opencv4)
 find_package(Ceres REQUIRED)
 include_directories(${CERES_INCLUDE_DIRS})
 
+# TODO: Remove dependencies.
+# OpenVins.
+set(OPENVINS_DIR ${CMAKE_SOURCE_DIR}/../third_party/open_vins/)
+include_directories(${OPENVINS_DIR}/ov_core/src)
+link_directories(${OPENVINS_DIR}/ov_core/build/devel/lib)
+
 include_directories(include)
 # Make library
 file(GLOB_RECURSE ALL_HEADER_FILES
@@ -27,7 +33,7 @@ file(GLOB_RECURSE ALL_SRC_FILES
 )
 
 add_library(${PROJECT_NAME} SHARED ${ALL_SRC_FILES})
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${CERES_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${CERES_LIBRARIES} ov_core_lib)
 
 # install
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install)
