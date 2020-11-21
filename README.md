@@ -20,7 +20,8 @@ An odometry algorithm by fusing visual and wheel information in an Extended Kalm
 
 For details, please refer to: TODO
 
-<img src="https://github.com/ydsf16/TinyGrapeKit/blob/master/app/VWO_MSCKF/doc/KAIST.png" width = 430 height = 240 />
+![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/VWO_MSCKF/doc/KAIST.png)
+![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/VWO_MSCKF/doc/SIM.png)
 
 We used the KAIST dataset to test our method. https://irap.kaist.ac.kr/dataset/
 
