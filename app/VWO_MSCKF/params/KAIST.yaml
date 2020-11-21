@@ -20,7 +20,7 @@ Camera.height: 560
 Wheel.kl: 0.00047820240382508
 Wheel.kr: 0.00047768621928995
 Wheel.b: 1.52439
-Wheel.noise_factor: 0.02
+Wheel.noise_factor: 0.2
 
 # Extrinsic
 Extrinsic.O_R_C: !!opencv-matrix
@@ -71,7 +71,7 @@ updater.visual_noise: 1.
 updater.min_window_length: 1.
 updater.min_used_points: 3
 updater.min_res_size: 4
-updater.plane_rot_noise: 0.01
+updater.plane_rot_noise: 1e-6
 updater.plane_trans_noise: 0.01
 
 # System config.
