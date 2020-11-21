@@ -15,7 +15,7 @@ namespace VWO {
 class Visualizer {
 public:
     struct Config {
-        double cam_size = 2.;
+        double cam_size = 1.5;
         double cam_line_width = 3.;
         double point_size = 2.;
         double wheel_frame_size = 2.;

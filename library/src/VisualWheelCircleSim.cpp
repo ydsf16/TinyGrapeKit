@@ -77,8 +77,8 @@ bool VisualWheelCircleSim::SimOneFrame(double* timestamp,
             const long int ft_id = (*feature_ids)[i];
             const Eigen::Vector2d pt = (*features)[i];
             const cv::Point2d cv_pt(pt[0], pt[1]);
-            cv::circle(*image, cv_pt, 1, cv::Scalar(255, 0, 0), -1);
-            cv::putText(*image, std::to_string(ft_id), cv_pt, 1, 1, cv::Scalar(0, 255, 0));
+            cv::circle(*image, cv_pt, 5, cv::Scalar(0, 255, 0), -1);
+            // cv::putText(*image, std::to_string(ft_id), cv_pt, 1, 1, cv::Scalar(0, 255, 0));
         } 
     }
 

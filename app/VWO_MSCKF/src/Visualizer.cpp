@@ -42,7 +42,7 @@ void Visualizer::DrawFeatures(const std::vector<Eigen::Vector3d>& features) {
 
 void Visualizer::DrawColorImage(const cv::Mat& image) {
     std::lock_guard<std::mutex> lg(data_buffer_mutex_);
-    cv::resize(image, image_, cv::Size(config_.img_width, config_.img_heigh));
+    cv::resize(image, image_, cv::Size(config_.img_width, config_.img_heigh), 0., 0., cv::INTER_NEAREST);
     cv::flip(image_, image_, 0);
 }
 
@@ -193,6 +193,8 @@ void Visualizer::Run() {
     pangolin::Var<bool> menu_follow_cam("menu.Follow Camera", true, true);
     pangolin::Var<int> grid_scale("menu.Grid Size (m)", 100, 1, 500);
     pangolin::Var<bool> draw_grid("menu.Draw Grid", true, true);
+    pangolin::Var<bool> draw_map("menu.Draw Map", true, true);
+    pangolin::Var<bool> draw_cam("menu.Draw Camera", true, true);
 
     // Define Camera Render Object (for view / scene browsing)
     pangolin::OpenGlRenderState s_cam(
@@ -228,7 +230,7 @@ void Visualizer::Run() {
         }
 
         // Draw grid.
-        if (draw_grid) {
+        if (draw_grid.Get()) {
             glColor3f(0.3f, 0.3f, 0.3f);
             pangolin::glDraw_z0(grid_scale, 1000);
         }
@@ -243,16 +245,20 @@ void Visualizer::Run() {
         DrawTraj(gt_wheel_traj_);
 
         // Draw raw odometry.
-        glColor3f(0.0f, 0.0f, 1.0f);
+        glColor3f(1.0f, 0.0f, 1.0f);
         DrawTraj(wheel_odom_traj_);
 
         // Draw camera poses.
-        glColor3f(0.0f, 1.0f, 0.0f);
-        DrawCameras();
+        if (draw_cam.Get()) {
+            glColor3f(0.0f, 1.0f, 0.0f);
+            DrawCameras();
+        }
 
         // Draw map points.
-        glColor3f(0.0f, 0.0f, 1.0f);
-        DrawFeatures();
+        if (draw_map.Get()) {
+            glColor3f(0.0f, 0.0f, 1.0f);
+            DrawFeatures();
+        }
 
         // Draw image
         {

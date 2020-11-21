@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 
     // Create the simulator.
     TGK::Simulation::VisualWheelCircleSim sim(camera, 
-        params.wheel_param.kl, params.wheel_param.kr, params.wheel_param.b - 0.5,
+        params.wheel_param.kl, params.wheel_param.kr, params.wheel_param.b - 0.4, // Add noise.
         params.extrinsic.O_R_C, params.extrinsic.O_p_C);
 
     // Create VWO system.
@@ -65,6 +65,12 @@ int main(int argc, char** argv) {
 
         if (++cnt <= kSkipCnt) { continue; }
         cnt = 0;
+        
+        // Add noise.
+        for (Eigen::Vector2d& ft : features) {
+            ft += Eigen::Vector2d::Random();
+        }
+        
         vwo_sys.FeedSimData(timestamp, image, features, feature_ids);
     }
     
