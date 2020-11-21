@@ -3,6 +3,9 @@
 #include <Eigen/Core>
 
 #include <VWO/Visualizer.h>
+#include <VWO/Updater.h>
+#include <TGK/Geometry/Triangulator.h>
+#include <TGK/ImageProcessor/OpenVinsTracker.h>
 
 namespace VWO {
 
@@ -35,6 +38,11 @@ struct ExtrinsicParam {
     Eigen::Vector3d O_p_C;
 };
 
+struct SysConfig {
+    int sliding_window_size;
+    bool compute_raw_odom;
+};
+
 struct Parameter {
     // Camera instrinc.
     CamParam cam_intrinsic;
@@ -44,6 +52,11 @@ struct Parameter {
     ExtrinsicParam extrinsic;
 
     Visualizer::Config viz_config;
+    TGK::Geometry::Triangulator::Config tri_config;
+    TGK::ImageProcessor::OpenVinsTracker::Config tracker_config;
+    Updater::Config updater_config;
+
+    SysConfig sys_config;
 };
 
 }  // namespace VWO

@@ -8,7 +8,7 @@
 namespace TGK {
 namespace Geometry {
 
-Triangulator::Triangulator(const Camera::CameraPtr camera) : camera_(camera) { } 
+Triangulator::Triangulator(const Config& config, const Camera::CameraPtr camera) : config_(config), camera_(camera) { } 
 
 bool Triangulator::Triangulate(const std::vector<Eigen::Matrix3d>& G_R_Cs, 
                                const std::vector<Eigen::Vector3d>& G_p_Cs,

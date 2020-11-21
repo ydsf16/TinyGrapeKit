@@ -21,6 +21,9 @@ VWOSystem::VWOSystem(const std::string& param_file)
     /// Load parameters.
     LoadParam(param_file, &param_);
 
+    config_.compute_raw_odom_ = param_.sys_config.compute_raw_odom;
+    config_.sliding_window_size_ = param_.sys_config.sliding_window_size;
+
     /// Initialize all modules.
     data_sync_ = std::make_unique<TGK::DataSynchronizer::WheelImageSynchronizer>();
 
@@ -38,8 +41,7 @@ VWOSystem::VWOSystem(const std::string& param_file)
         param_.cam_intrinsic.p1, param_.cam_intrinsic.p2,
         param_.cam_intrinsic.k3);
 
-    
-    const auto triangulator = std::make_shared<TGK::Geometry::Triangulator>(camera_);
+    const auto triangulator = std::make_shared<TGK::Geometry::Triangulator>(param_.tri_config, camera_);
 
     // Create feature tracker.
     Eigen::Matrix<double, 8, 1> cam_intrin;
@@ -48,12 +50,10 @@ VWOSystem::VWOSystem(const std::string& param_file)
                   param_.cam_intrinsic.k1, param_.cam_intrinsic.k2,
                   param_.cam_intrinsic.p1, param_.cam_intrinsic.p2;
 
-    feature_tracker_ = std::make_shared<TGK::ImageProcessor::OpenVinsTracker>(
-        TGK::ImageProcessor::OpenVinsTracker::Config(), cam_intrin);
+    feature_tracker_ = std::make_shared<TGK::ImageProcessor::OpenVinsTracker>(param_.tracker_config, cam_intrin);
     sim_feature_tracker_ = std::make_shared<TGK::ImageProcessor::SimFeatureTrakcer>();  
 
-    Updater::Config updater_config;
-    updater_ = std::make_unique<Updater>(updater_config, camera_, feature_tracker_, triangulator);
+    updater_ = std::make_unique<Updater>(param_.updater_config, camera_, feature_tracker_, triangulator);
 
     viz_ = std::make_unique<Visualizer>(param_.viz_config);
 
@@ -129,7 +129,7 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
     }
 
     // Do not marginalize the last state if no enough camera state in the buffer.
-    const bool marg_old_state = state_.camera_frames.size() >= config_.sliding_window_size;
+    const bool marg_old_state = state_.camera_frames.size() >= config_.sliding_window_size_;
 
     // Update state.
     std::vector<Eigen::Vector2d> tracked_features;

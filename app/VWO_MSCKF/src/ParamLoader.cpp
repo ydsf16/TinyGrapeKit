@@ -39,6 +39,46 @@ void LoadParam(const std::string& param_file, Parameter* params) {
         cv_O_R_C.at<double>(1, 0), cv_O_R_C.at<double>(1, 1), cv_O_R_C.at<double>(1, 2), 
         cv_O_R_C.at<double>(2, 0), cv_O_R_C.at<double>(2, 1), cv_O_R_C.at<double>(2, 2), 
     params->extrinsic.O_p_C << cv_O_p_C.at<double>(0, 0), cv_O_p_C.at<double>(1, 0), cv_O_p_C.at<double>(2, 0);
+
+    // Visualization
+    params->viz_config.cam_size = cv_params["viz_config.cam_size"];
+    params->viz_config.cam_line_width = cv_params["viz_config.cam_line_width"];
+    params->viz_config.point_size = cv_params["viz_config.point_size"];
+    params->viz_config.wheel_frame_size = cv_params["viz_config.wheel_frame_size"];
+    params->viz_config.view_point_x = cv_params["viz_config.view_point_x"];
+    params->viz_config.view_point_y = cv_params["viz_config.view_point_y"];
+    params->viz_config.view_point_z = cv_params["viz_config.view_point_z"];
+    params->viz_config.view_point_f = cv_params["viz_config.view_point_f"];
+    params->viz_config.img_height = cv_params["viz_config.img_height"];
+    params->viz_config.img_width = cv_params["viz_config.img_width"];
+    params->viz_config.max_traj_length = cv_params["viz_config.max_traj_length"];
+    params->viz_config.max_num_features = cv_params["viz_config.max_num_features"];
+
+
+    // Triangulator
+    params->tri_config.max_proj_res = cv_params["tri_config.max_proj_res"];
+    params->tri_config.min_dist = cv_params["tri_config.min_dist"];
+    params->tri_config.max_dist = cv_params["tri_config.max_dist"];
+
+    // Feature tracker
+    params->tracker_config.num_pts = cv_params["tracker_config.num_pts"];
+    params->tracker_config.fast_th = cv_params["tracker_config.fast_th"];
+    params->tracker_config.grid_x = cv_params["tracker_config.grid_x"];
+    params->tracker_config.grid_y = cv_params["tracker_config.grid_y"];
+    params->tracker_config.max_px_dist = cv_params["tracker_config.max_px_dist"];
+    cv_params["tracker_config.use_klt"] >> params->tracker_config.use_klt;
+
+    // Updater
+    params->updater_config.visual_noise = cv_params["updater.visual_noise"];
+    params->updater_config.min_window_length = cv_params["updater.min_window_length"];
+    params->updater_config.min_used_points = cv_params["updater.min_used_points"];
+    params->updater_config.min_res_size = cv_params["updater.min_res_size"];
+    params->updater_config.plane_rot_noise = cv_params["updater.plane_rot_noise"];
+    params->updater_config.plane_trans_noise = cv_params["updater.plane_trans_noise"];
+
+    // System config.
+    params->sys_config.sliding_window_size = cv_params["updater.sliding_window_size"];
+    cv_params["updater.compute_raw_odom"] >> params->sys_config.compute_raw_odom;
 }
 
 }  // namespace VWO

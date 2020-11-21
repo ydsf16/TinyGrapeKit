@@ -124,9 +124,9 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest,
     big_plane_H.block<3, 6>(0, 0) = plane_H;
 
     Eigen::Matrix3d plane_noise = Eigen::Matrix3d::Identity();
-    plane_noise(0, 0) = 1.;
-    plane_noise(1, 1) = 1.;
-    plane_noise(2, 2) = 1.;
+    plane_noise(0, 0) = config_.plane_rot_noise;
+    plane_noise(1, 1) = config_.plane_rot_noise;
+    plane_noise(2, 2) = config_.plane_trans_noise;
     EKFUpdate(big_plane_H, plane_res, plane_noise, state);
 
     // Remove use/lost features.

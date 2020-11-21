@@ -19,6 +19,9 @@ public:
         double min_window_length = 3.;
         int min_used_points = 5;
         int min_res_size = 10;
+
+        double plane_rot_noise = 0.01;
+        double plane_trans_noise = 0.01;
     };
 
     struct FeatureObservation {

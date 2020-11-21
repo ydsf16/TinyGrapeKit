@@ -24,7 +24,7 @@ public:
         double view_point_z = 200.;
         double view_point_f = 500.;
 
-        double img_heigh = 140;
+        double img_height = 140;
         double img_width = 320;
 
         int max_traj_length = 100000;

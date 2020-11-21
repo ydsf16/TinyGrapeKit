@@ -24,7 +24,7 @@ namespace VWO {
 class VWOSystem {
 public:
     struct Config {
-        int sliding_window_size = 10;
+        int sliding_window_size_ = 10;
         bool compute_raw_odom_ =  true;
     };
 

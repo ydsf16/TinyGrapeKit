@@ -42,7 +42,7 @@ void Visualizer::DrawFeatures(const std::vector<Eigen::Vector3d>& features) {
 
 void Visualizer::DrawColorImage(const cv::Mat& image) {
     std::lock_guard<std::mutex> lg(data_buffer_mutex_);
-    cv::resize(image, image_, cv::Size(config_.img_width, config_.img_heigh), 0., 0., cv::INTER_NEAREST);
+    cv::resize(image, image_, cv::Size(config_.img_width, config_.img_height), 0., 0., cv::INTER_NEAREST);
     cv::flip(image_, image_, 0);
 }
 
@@ -62,7 +62,7 @@ void Visualizer::DrawImage(const cv::Mat& image,
     }
     
     std::lock_guard<std::mutex> lg(data_buffer_mutex_);
-    cv::resize(color_img, image_, cv::Size(config_.img_width, config_.img_heigh));
+    cv::resize(color_img, image_, cv::Size(config_.img_width, config_.img_height));
     cv::flip(image_, image_, 0);
 }
 
@@ -208,9 +208,9 @@ void Visualizer::Run() {
 
     // Draw image.
     pangolin::View& d_image = pangolin::Display("image")
-      .SetBounds(0.8f, 1.0f, 0.1, 1./3, config_.img_width / config_.img_heigh)
+      .SetBounds(0.8f, 1.0f, 0.1, 1./3, config_.img_width / config_.img_height)
       .SetLock(pangolin::LockLeft, pangolin::LockTop);
-    pangolin::GlTexture image_texture(config_.img_width, config_.img_heigh, GL_RGB, true, 0, GL_RGB, GL_UNSIGNED_BYTE);
+    pangolin::GlTexture image_texture(config_.img_width, config_.img_height, GL_RGB, true, 0, GL_RGB, GL_UNSIGNED_BYTE);
 
     pangolin::OpenGlMatrix G_T_C;
     G_T_C.SetIdentity();

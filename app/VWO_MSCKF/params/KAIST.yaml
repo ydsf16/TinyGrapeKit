@@ -36,3 +36,42 @@ Extrinsic.O_p_C: !!opencv-matrix
    cols: 1
    dt: d
    data: [ 1.64239, 0.247401, 1.58411 ]
+
+# Visualization
+viz_config.cam_size: 1.5
+viz_config.cam_line_width: 3.
+viz_config.point_size: 2.
+viz_config.wheel_frame_size: 2.
+viz_config.view_point_x: 0.
+viz_config.view_point_y: 0.
+viz_config.view_point_z: 200.
+viz_config.view_point_f: 500.
+
+viz_config.img_height: 140
+viz_config.img_width: 320
+
+viz_config.max_traj_length: 100000
+viz_config.max_num_features: 5000
+
+# Triangulator
+tri_config.max_proj_res: 2.
+tri_config.min_dist: 0.1
+tri_config.max_dist: 100.
+
+# FeatureTracker
+tracker_config.num_pts: 200
+tracker_config.fast_th: 10
+tracker_config.grid_x: 10
+tracker_config.grid_y: 5
+tracker_config.max_px_dist: 9
+tracker_config.use_klt: true
+
+# Updater
+updater.visual_noise: 1.
+updater.min_window_length: 1.
+updater.min_used_points: 3
+updater.min_res_size: 4
+
+# System config.
+sys_config.sliding_window_size: 10
+sys_config.compute_raw_odom: true
