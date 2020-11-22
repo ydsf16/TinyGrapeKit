@@ -11,14 +11,31 @@ WheelPropagator::WheelPropagator(const double kl, const double kr, const double 
                                  const double noise_factor, const double roll_pitch_noise, const double z_noise) 
     : kl_(kl), kr_(kr), b_(b), noise_factor_(noise_factor), roll_pitch_noise_(roll_pitch_noise), z_noise_(z_noise) { }
 
+void WheelPropagator::PropagateUsingEncoder(const double kl, const double kr, const double b,
+                                            const double begin_wl, const double begin_wr,
+                                            const double end_wl, const double end_wr,
+                                            Eigen::Matrix3d* G_R_O, Eigen::Vector3d* G_p_O,
+                                            Eigen::Matrix<double, 6, 6>* J_wrt_pose,
+                                            Eigen::Matrix<double, 6, 3>* J_wrt_intrinsic,
+                                            Eigen::Matrix<double, 6, 6>* cov) {
+    kl_ = kl;
+    kr_ = kr;
+    b_ = b;
+
+    PropagateUsingEncoder(begin_wl, begin_wr, end_wl, end_wr, G_R_O, G_p_O, J_wrt_pose, J_wrt_intrinsic, cov);
+}
+
 void WheelPropagator::PropagateUsingEncoder(const double begin_wl, const double begin_wr,
                                             const double end_wl, const double end_wr,
                                             Eigen::Matrix3d* G_R_O, Eigen::Vector3d* G_p_O,
                                             Eigen::Matrix<double, 6, 6>* J_wrt_pose,
+                                            Eigen::Matrix<double, 6, 3>* J_wrt_intrinsic,
                                             Eigen::Matrix<double, 6, 6>* cov) {
     // Pre-computation.
-    const double left_dist = (end_wl - begin_wl) * kl_;
-    const double right_dist = (end_wr - begin_wr) * kr_;
+    const double left_w_dist = (end_wl - begin_wl);
+    const double left_dist = left_w_dist * kl_;
+    const double right_w_dist = (end_wr - begin_wr);
+    const double right_dist = right_w_dist * kr_;
     const double delta_yaw = (right_dist - left_dist) / b_;
     const double delta_dist = (right_dist + left_dist) * 0.5;
 
@@ -34,6 +51,22 @@ void WheelPropagator::PropagateUsingEncoder(const double begin_wl, const double 
     if (J_wrt_pose != nullptr) {
         *J_wrt_pose << delta_R.transpose(),            Eigen::Matrix3d::Zero(), 
                       -old_G_R_O *Util::Skew(delta_p), Eigen::Matrix3d::Identity();
+    }
+
+    // Jacobian WRT intrinsic.
+    if (J_wrt_intrinsic != nullptr) {
+        Eigen::Matrix<double, 6, 6> J_wrt_delta_pose = Eigen::Matrix<double, 6, 6>::Identity();
+        J_wrt_delta_pose.block<3, 3>(3, 3) = old_G_R_O;
+
+        Eigen::Matrix<double, 6, 3> J_delta_pose_wrt_intrinsic = Eigen::Matrix<double, 6, 3>::Zero();
+        J_delta_pose_wrt_intrinsic(2, 0) = -left_w_dist / b_;
+        J_delta_pose_wrt_intrinsic(2, 1) = right_w_dist / b_;
+        J_delta_pose_wrt_intrinsic(2, 2) = -(right_dist - left_dist) / (b_ * b_);
+
+        J_delta_pose_wrt_intrinsic(3, 0) = left_w_dist * 0.5;
+        J_delta_pose_wrt_intrinsic(3, 1) = right_w_dist * 0.5;
+   
+        *J_wrt_intrinsic = J_wrt_delta_pose * J_delta_pose_wrt_intrinsic;
     }
 
     // Covariance.

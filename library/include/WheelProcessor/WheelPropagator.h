@@ -16,6 +16,15 @@ public:
                                const double end_wl, const double end_wr,
                                Eigen::Matrix3d* G_R_O, Eigen::Vector3d* G_p_O,
                                Eigen::Matrix<double, 6, 6>* J_wrt_pose = nullptr,
+                               Eigen::Matrix<double, 6, 3>* J_wrt_intrinsic = nullptr,
+                               Eigen::Matrix<double, 6, 6>* cov = nullptr);
+
+    void PropagateUsingEncoder(const double kl, const double kr, const double b,
+                               const double begin_wl, const double begin_wr,
+                               const double end_wl, const double end_wr,
+                               Eigen::Matrix3d* G_R_O, Eigen::Vector3d* G_p_O,
+                               Eigen::Matrix<double, 6, 6>* J_wrt_pose = nullptr,
+                               Eigen::Matrix<double, 6, 3>* J_wrt_intrinsic = nullptr,
                                Eigen::Matrix<double, 6, 6>* cov = nullptr);
 
 private:
