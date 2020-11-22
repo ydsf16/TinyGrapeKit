@@ -28,11 +28,16 @@ struct State {
         // Update Wheel_pose.
         wheel_pose.Update(delta_x.segment(wheel_pose.state_idx, wheel_pose.size));
 
+        // Update intrinsic.
+        wheel_intrinsic.Update(delta_x.segment(wheel_intrinsic.state_idx, wheel_intrinsic.size));
+
         // Update Camera pose.
         for (CameraFramePtr& cam_fm : camera_frames) {
             cam_fm->Update(delta_x.segment(cam_fm->state_idx, cam_fm->size));
         }
     }
+
+    int slid_idx;
 };
 
 }  // namespace VWO

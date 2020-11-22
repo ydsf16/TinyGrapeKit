@@ -20,7 +20,7 @@ Camera.height: 560
 Wheel.kl: 0.00047820240382508
 Wheel.kr: 0.00047768621928995
 Wheel.b: 1.52439
-Wheel.noise_factor: 0.2
+Wheel.noise_factor: 0.05
 
 # Extrinsic
 Extrinsic.O_R_C: !!opencv-matrix
@@ -64,7 +64,7 @@ tracker_config.quality_level: 0.01
 tracker_config.min_dist: 40
 
 # Updater
-updater.visual_noise: 0.25
+updater.visual_noise: 1.
 updater.min_window_length: 1.
 updater.min_cam_dist_to_triangulate: 0.3
 updater.min_res_size: 4

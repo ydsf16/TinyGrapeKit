@@ -70,7 +70,7 @@ void EKFUpdate(const Eigen::MatrixXd& H,
     state->covariance = I_KH * P_minus * I_KH.transpose() + K * V * K.transpose();
 
     state->covariance = state->covariance.eval().selfadjointView<Eigen::Upper>();
-    LimitMinDiagValue(1e-12, &state->covariance);
+    LimitMinDiagValue(1e-18, &state->covariance);
 }
 
 

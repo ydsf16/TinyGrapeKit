@@ -16,6 +16,9 @@ public:
                    State* state);
 private:
     std::unique_ptr<TGK::WheelProcessor::WheelPropagator> wheel_propagator_;
+
+    const double klkr_process_noise_ = 1e-18;
+    const double b_process_noise_ = 1e-12;
 };
 
 }  // namespace VWO

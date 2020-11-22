@@ -20,10 +20,13 @@ void MargOldestState(State* state) {
     Eigen::MatrixXd new_cov(new_cov_size, new_cov_size);
 
     const Eigen::MatrixXd& old_cov = state->covariance;
-    new_cov.block<6, 6>(0, 0) = old_cov.block<6, 6>(0, 0);
-    new_cov.block(0, 6, 6, new_cov_size - 6) = old_cov.block(0, 12, 6, new_cov_size - 6);
-    new_cov.block(6, 6, new_cov_size - 6, new_cov_size - 6)
-        = old_cov.block(12, 12, new_cov_size - 6, new_cov_size - 6);
+    new_cov.block(0, 0, state->slid_idx, state->slid_idx) = old_cov.block(0, 0, state->slid_idx, state->slid_idx);
+
+    new_cov.block(0, state->slid_idx, state->slid_idx, new_cov_size - state->slid_idx) = 
+        old_cov.block(0, state->slid_idx + 6, state->slid_idx, new_cov_size - state->slid_idx);
+    
+    new_cov.block(state->slid_idx, state->slid_idx, new_cov_size - state->slid_idx, new_cov_size - state->slid_idx)
+        = old_cov.block(state->slid_idx + 6, state->slid_idx + 6, new_cov_size - state->slid_idx, new_cov_size - state->slid_idx);
 
     // Force symetric.
     state->covariance = new_cov.selfadjointView<Eigen::Upper>();

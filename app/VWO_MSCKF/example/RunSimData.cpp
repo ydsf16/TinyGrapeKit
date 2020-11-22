@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    FLAGS_minloglevel = 3;
+    FLAGS_minloglevel = 0;
     const std::string param_file = argv[1];
 
     VWO::Parameter params;
