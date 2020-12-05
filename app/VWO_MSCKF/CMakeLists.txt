@@ -24,6 +24,7 @@ link_directories(${TGK_DIR}/lib)
 # Pangolin
 set(Pangolin_DIR ${CMAKE_SOURCE_DIR}/../../third_party/Pangolin)
 include_directories(${Pangolin_DIR}/include)
+include_directories(${Pangolin_DIR}/build/src/include)
 link_directories(${Pangolin_DIR}/build/src)
 
 # Make library
