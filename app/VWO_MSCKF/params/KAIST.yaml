@@ -37,6 +37,12 @@ Extrinsic.O_p_C: !!opencv-matrix
    dt: d
    data: [ 1.64239, 0.247401, 1.58411 ]
 
+Extrinsic.C_p_Gps: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [ 0.247401, -0.20, -1.96 ]
+
 # Visualization
 viz_config.cam_size: 1.5
 viz_config.cam_line_width: 3.

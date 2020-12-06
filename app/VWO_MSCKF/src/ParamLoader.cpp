@@ -34,11 +34,15 @@ void LoadParam(const std::string& param_file, Parameter* params) {
     cv_params["Extrinsic.O_R_C"] >> cv_O_R_C;
     cv::Mat cv_O_p_C;
     cv_params["Extrinsic.O_p_C"] >> cv_O_p_C;
+    cv::Mat cv_C_p_Gps;
+    cv_params["Extrinsic.C_p_Gps"] >> cv_C_p_Gps;
+
     params->extrinsic.O_R_C << 
         cv_O_R_C.at<double>(0, 0), cv_O_R_C.at<double>(0, 1), cv_O_R_C.at<double>(0, 2), 
         cv_O_R_C.at<double>(1, 0), cv_O_R_C.at<double>(1, 1), cv_O_R_C.at<double>(1, 2), 
         cv_O_R_C.at<double>(2, 0), cv_O_R_C.at<double>(2, 1), cv_O_R_C.at<double>(2, 2), 
     params->extrinsic.O_p_C << cv_O_p_C.at<double>(0, 0), cv_O_p_C.at<double>(1, 0), cv_O_p_C.at<double>(2, 0);
+    params->extrinsic.C_p_Gps << cv_C_p_Gps.at<double>(0, 0), cv_C_p_Gps.at<double>(1, 0), cv_C_p_Gps.at<double>(2, 0);
 
     // Visualization
     params->viz_config.cam_size = cv_params["viz_config.cam_size"];

@@ -59,8 +59,7 @@ VWOSystem::VWOSystem(const std::string& param_file)
     } 
 
     if (config_.enable_gps_update) {
-        const Eigen::Vector3d C_p_Gps = Eigen::Vector3d::Zero();
-        gps_updater_ = std::make_unique<GpsUpdater>(C_p_Gps);
+        gps_updater_ = std::make_unique<GpsUpdater>(param_.extrinsic.C_p_Gps);
     }
 
     viz_ = std::make_unique<Visualizer>(param_.viz_config);

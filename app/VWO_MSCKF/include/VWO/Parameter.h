@@ -37,6 +37,8 @@ struct WheelParam {
 struct ExtrinsicParam {
     Eigen::Matrix3d O_R_C;
     Eigen::Vector3d O_p_C;
+
+    Eigen::Vector3d C_p_Gps;
 };
 
 struct SysConfig {
