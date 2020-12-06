@@ -10,8 +10,6 @@
 
 namespace VWO {
 
-namespace {
-
 bool FindNearestTwoFrames(const double timestamp, const std::deque<CameraFramePtr> camera_frames,
                           CameraFramePtr* frame_a, CameraFramePtr* frame_b) {
     if (camera_frames.size() < 2 || 
@@ -100,7 +98,7 @@ bool ComputeGpsConstraintResidualJacobian(const Eigen::Vector3d& C_p_Gps,
 }
 
 Eigen::Vector3d ConvertLonLatHeiToENU(const Eigen::Vector3d& init_long_lat_hei, 
-                                  const Eigen::Vector3d& point_long_lat_hei) {
+                                      const Eigen::Vector3d& point_long_lat_hei) {
     Eigen::Vector3d point_enu;
     static GeographicLib::LocalCartesian local_cartesian;
     local_cartesian.Reset(init_long_lat_hei(1), init_long_lat_hei(0), init_long_lat_hei(2));
@@ -111,7 +109,7 @@ Eigen::Vector3d ConvertLonLatHeiToENU(const Eigen::Vector3d& init_long_lat_hei,
 }
 
 Eigen::Vector3d ConvertENUToLonLatHei(const Eigen::Vector3d& init_long_lat_hei, 
-                                  const Eigen::Vector3d& point_enu) {
+                                      const Eigen::Vector3d& point_enu) {
     Eigen::Vector3d point_long_lat_hei;
     static GeographicLib::LocalCartesian local_cartesian;
     local_cartesian.Reset(init_long_lat_hei(1), init_long_lat_hei(0), init_long_lat_hei(2));
@@ -121,7 +119,6 @@ Eigen::Vector3d ConvertENUToLonLatHei(const Eigen::Vector3d& init_long_lat_hei,
     return point_long_lat_hei;
 }
 
-}
 
 GpsUpdater::GpsUpdater(const Eigen::Vector3d& C_p_Gps) : C_p_Gps_(C_p_Gps) { }
 
@@ -195,6 +192,11 @@ bool GpsUpdater::UpdateState(const TGK::BaseType::GpsDataConstPtr gps_data, Stat
 void GpsUpdater::SetInitLonLatHei(const Eigen::Vector3d& init_lon_lat_hei) {
     init_lon_lat_hei_ = init_lon_lat_hei;
     init_set = true;
+}
+
+bool GpsUpdater::GetInitLonLatHei(Eigen::Vector3d* init_lon_lat_hei) {
+    *init_lon_lat_hei = init_lon_lat_hei_;
+    return init_set;
 }
 
 }  // namespace VWO

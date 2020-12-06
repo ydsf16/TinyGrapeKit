@@ -229,6 +229,13 @@ bool VWOSystem::FeedGpsData(const double timestamp, const double longitude, cons
     gps_data_ptr->lon_lat_hei << longitude, latitude, height;
     gps_data_ptr->cov = cov;
 
+    // Draw raw gps data.
+    Eigen::Vector3d init_llh;
+    if (gps_updater_->GetInitLonLatHei(&init_llh)) {
+        const Eigen::Vector3d G_p_Gps = ConvertLonLatHeiToENU(init_llh, gps_data_ptr->lon_lat_hei);
+        viz_->DrawGps(G_p_Gps);
+    }
+
     if (!initialized_) {
         latest_gps_data_ = gps_data_ptr;
         LOG(WARNING) << "[FeedGpsData]: System not initialized.";

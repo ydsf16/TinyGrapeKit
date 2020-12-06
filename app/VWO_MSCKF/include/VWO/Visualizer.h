@@ -29,6 +29,8 @@ public:
 
         int max_traj_length = 100000;
         int max_num_features = 5000;
+        int max_gps_length = 10000;
+        double gps_point_size = 5.;
     };
 
     Visualizer(const Config& config);
@@ -52,6 +54,8 @@ public:
 
     void DrawWheelOdom(const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O);
 
+    void DrawGps(const Eigen::Vector3d& G_p_Gps);
+
 private:
     void Run();
 
@@ -61,6 +65,7 @@ private:
     void DrawFeatures();
     void DrawWheeFrame(const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O);
     void DrawWheeFrame();
+    void DrawGpsPoints();
 
     const Config config_;
     
@@ -75,6 +80,7 @@ private:
     std::deque<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> gt_wheel_traj_;
     std::deque<std::pair<Eigen::Matrix3d, Eigen::Vector3d>> wheel_odom_traj_;
     std::deque<Eigen::Vector3d> features_;
+    std::deque<Eigen::Vector3d> gps_points_;
 
     cv::Mat image_;
 };

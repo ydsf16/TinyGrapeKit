@@ -46,6 +46,14 @@ void Visualizer::DrawColorImage(const cv::Mat& image) {
     cv::flip(image_, image_, 0);
 }
 
+void Visualizer::DrawGps(const Eigen::Vector3d& G_p_Gps) {
+    std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+    gps_points_.push_back(G_p_Gps);
+    if (gps_points_.size() > config_.max_gps_length) {
+        gps_points_.pop_front();
+    }
+}
+
 void Visualizer::DrawImage(const cv::Mat& image, 
                            const std::vector<Eigen::Vector2d>& tracked_fts, 
                            const std::vector<Eigen::Vector2d>& new_fts) {
@@ -179,6 +187,18 @@ void Visualizer::DrawWheeFrame() {
     DrawWheeFrame(wheel_traj_.back().first, wheel_traj_.back().second);
 }
 
+void Visualizer::DrawGpsPoints() {
+    glPointSize(config_.gps_point_size);
+    glBegin(GL_POINTS);
+
+    std::lock_guard<std::mutex> lg(data_buffer_mutex_);
+    for (const Eigen::Vector3d& pt : gps_points_) {
+        glVertex3f(pt[0], pt[1], pt[2]);
+    }
+
+    glEnd();
+}
+
 void Visualizer::Run() {
     pangolin::CreateWindowAndBind("TinyGrapeKit-VWO-MSCKF", 1920, 1080);
     glEnable(GL_DEPTH_TEST);
@@ -268,6 +288,10 @@ void Visualizer::Run() {
             glColor3f(0.0f, 0.0f, 1.0f);
             DrawFeatures();
         }
+
+        // Draw Gps points.
+        glColor3f(0.0f, 1.0f, 1.0f);
+        DrawGpsPoints();
 
         // Draw image
         {
