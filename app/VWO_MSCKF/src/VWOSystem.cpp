@@ -21,6 +21,7 @@ VWOSystem::VWOSystem(const std::string& param_file)
 
     config_.compute_raw_odom_ = param_.sys_config.compute_raw_odom;
     config_.sliding_window_size_ = param_.sys_config.sliding_window_size;
+    config_.enable_plane_update = param_.sys_config.enable_plane_update;
 
     /// Initialize all modules.
     data_sync_ = std::make_unique<TGK::DataSynchronizer::WheelImageSynchronizer>();
@@ -51,7 +52,10 @@ VWOSystem::VWOSystem(const std::string& param_file)
     feature_tracker_ = std::make_shared<TGK::ImageProcessor::KLTFeatureTracker>(param_.tracker_config);
     sim_feature_tracker_ = std::make_shared<TGK::ImageProcessor::SimFeatureTrakcer>();  
 
-    updater_ = std::make_unique<Updater>(param_.updater_config, camera_, feature_tracker_, triangulator);
+    visual_updater_ = std::make_unique<VisualUpdater>(param_.visual_updater_config, camera_, feature_tracker_, triangulator);
+    if (config_.enable_plane_update) {
+        plane_updater_ = std::make_unique<PlaneUpdater>(param_.plane_updater_config);
+    } 
 
     viz_ = std::make_unique<Visualizer>(param_.viz_config);
 
@@ -105,6 +109,7 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
         }
     }
 
+    /// 1. Visual update
     // Augment state / Clone new camera state.
     AugmentState(img_ptr->timestamp, (++kFrameId), &state_);
 
@@ -133,12 +138,17 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
     std::vector<Eigen::Vector2d> tracked_features;
     std::vector<Eigen::Vector2d> new_features;
     std::vector<Eigen::Vector3d> map_points;
-    updater_->UpdateState(img_ptr->image, marg_old_state, 
-                          tracked_pts, tracked_pt_ids, lost_pt_ids, new_pt_ids,
-                          &state_, &tracked_features, &new_features, &map_points);
+    visual_updater_->UpdateState(img_ptr->image, marg_old_state, 
+                                 tracked_pts, tracked_pt_ids, lost_pt_ids, new_pt_ids,
+                                 &state_, &tracked_features, &new_features, &map_points);
 
     // Marginalize old state.
     if (marg_old_state) { MargOldestState(&state_); }
+
+    /// 2. Plane Update.
+    if (config_.enable_plane_update && plane_updater_ != nullptr) {
+        plane_updater_->UpdateState(&state_);
+    } 
 
     /// Visualize.
     viz_->DrawWheelPose(state_.wheel_pose.G_R_O, state_.wheel_pose.G_p_O);

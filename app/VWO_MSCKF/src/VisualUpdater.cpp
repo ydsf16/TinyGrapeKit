@@ -1,4 +1,4 @@
-#include <VWO/Updater.h>
+#include <VWO/VisualUpdater.h>
 
 #include <vector>
 #include <unordered_set>
@@ -10,21 +10,21 @@
 
 namespace VWO {
 
-Updater::Updater(const Config& config,
-                 const std::shared_ptr<TGK::Camera::Camera> camera,
-                 const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker,
-                 const std::shared_ptr<TGK::Geometry::Triangulator> triangulator)
+VisualUpdater::VisualUpdater(const Config& config,
+                             const std::shared_ptr<TGK::Camera::Camera> camera,
+                             const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker,
+                             const std::shared_ptr<TGK::Geometry::Triangulator> triangulator)
     : config_(config), camera_(camera), feature_tracker_(feature_tracker), triangulator_(triangulator) { }
 
-void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest, 
-                          const std::vector<Eigen::Vector2d>& tracked_pts, 
-                          const std::vector<long int>& tracked_pt_ids,
-                          const std::vector<long int>& lost_pt_ids,
-                          const std::set<long int>& new_pt_ids,
-                          State* state, 
-                          std::vector<Eigen::Vector2d>* tracked_features,
-                          std::vector<Eigen::Vector2d>* new_features,
-                          std::vector<Eigen::Vector3d>* map_points) {
+void VisualUpdater::UpdateState(const cv::Mat& image, const bool marg_oldest, 
+                                const std::vector<Eigen::Vector2d>& tracked_pts, 
+                                const std::vector<long int>& tracked_pt_ids,
+                                const std::vector<long int>& lost_pt_ids,
+                                const std::set<long int>& new_pt_ids,
+                                State* state, 
+                                std::vector<Eigen::Vector2d>* tracked_features,
+                                std::vector<Eigen::Vector2d>* new_features,
+                                std::vector<Eigen::Vector3d>* map_points) {
     // Collect features for observation.
     *tracked_features = tracked_pts; 
     for (size_t i = 0; i < tracked_pt_ids.size(); ++i) {
@@ -121,25 +121,11 @@ void Updater::UpdateState(const cv::Mat& image, const bool marg_oldest,
         EKFUpdate(H_cmp, r_cmp, V, state);
     }
 
-    // Plane constraint update.
-    Eigen::Vector3d plane_res;
-    Eigen::Matrix<double, 3, 6> plane_H;
-    ComputePlaneConstraintResidualJacobian(state->wheel_pose.G_R_O, state->wheel_pose.G_p_O, &plane_res, &plane_H);
-    Eigen::MatrixXd big_plane_H(3, state_size);
-    big_plane_H.setZero();
-    big_plane_H.block<3, 6>(0, 0) = plane_H;
-
-    Eigen::Matrix3d plane_noise = Eigen::Matrix3d::Identity();
-    plane_noise(0, 0) = config_.plane_rot_noise;
-    plane_noise(1, 1) = config_.plane_rot_noise;
-    plane_noise(2, 2) = config_.plane_trans_noise;
-    EKFUpdate(big_plane_H, plane_res, plane_noise, state);
-
     // Remove use/lost features.
     RemoveUsedFeatures(lost_ft_ids_set, state);
 }
 
-void Updater::RemoveUsedFeatures(const std::unordered_set<long int>& lost_ft_ids_set, State* state) {
+void VisualUpdater::RemoveUsedFeatures(const std::unordered_set<long int>& lost_ft_ids_set, State* state) {
     // Remove used features
     for (const auto& id : lost_ft_ids_set) {
         // Remove features in state.
@@ -154,7 +140,7 @@ void Updater::RemoveUsedFeatures(const std::unordered_set<long int>& lost_ft_ids
     }
 }
 
-bool Updater::ComputeProjectionResidualJacobian(const Eigen::Matrix3d& G_R_C,
+bool VisualUpdater::ComputeProjectionResidualJacobian(const Eigen::Matrix3d& G_R_C,
                                                 const Eigen::Vector3d& G_p_C,
                                                 const Eigen::Vector2d& im_pt,
                                                 const Eigen::Vector3d& G_p,
@@ -182,7 +168,7 @@ bool Updater::ComputeProjectionResidualJacobian(const Eigen::Matrix3d& G_R_C,
     return true;
 }
 
-void Updater::ComputeOnePointResidualJacobian(const Updater::FeatureObservation& one_feature_obs, 
+void VisualUpdater::ComputeOnePointResidualJacobian(const FeatureObservation& one_feature_obs, 
                                               const int state_size,
                                               Eigen::VectorXd* residual, 
                                               Eigen::MatrixXd* Hx,
@@ -230,7 +216,7 @@ void Updater::ComputeOnePointResidualJacobian(const Updater::FeatureObservation&
 }
 
 
-void Updater::ComputeVisualResidualJacobian(const std::vector<Updater::FeatureObservation>& features_full_obs, 
+void VisualUpdater::ComputeVisualResidualJacobian(const std::vector<FeatureObservation>& features_full_obs, 
                                             const int state_size,
                                             Eigen::VectorXd* res, 
                                             Eigen::MatrixXd* Jacobian) {
@@ -239,7 +225,7 @@ void Updater::ComputeVisualResidualJacobian(const std::vector<Updater::FeatureOb
     r_bars.reserve(features_full_obs.size());
     H_bars.reserve(features_full_obs.size());
     int num_rows = 0;
-    for (const Updater::FeatureObservation& one_feature_obs : features_full_obs) {
+    for (const FeatureObservation& one_feature_obs : features_full_obs) {
         Eigen::VectorXd res;
         Eigen::MatrixXd Hx;
         Eigen::Matrix<double, Eigen::Dynamic, 3> Hf;

@@ -12,7 +12,7 @@
 
 namespace VWO {
 
-class Updater {
+class VisualUpdater {
 public:
     struct Config {
         double visual_noise = 1. * 1.; // 1 pixel std.
@@ -31,10 +31,10 @@ public:
         Eigen::Vector3d G_p;
     };
 
-    Updater(const Config& config,
-            const std::shared_ptr<TGK::Camera::Camera> camera,
-            const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker,
-            const std::shared_ptr<TGK::Geometry::Triangulator> triangulator);
+    VisualUpdater(const Config& config,
+                  const std::shared_ptr<TGK::Camera::Camera> camera,
+                  const std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker,
+                  const std::shared_ptr<TGK::Geometry::Triangulator> triangulator);
 
     void UpdateState(const cv::Mat& image, const bool marg_oldest, 
                      const std::vector<Eigen::Vector2d>& tracked_pts, 
@@ -55,13 +55,13 @@ private:
                                            Eigen::Matrix<double, 2, 6>* J_wrt_cam_pose,
                                            Eigen::Matrix<double, 2, 3>* J_wrt_Gp);
 
-    void ComputeOnePointResidualJacobian(const Updater::FeatureObservation& one_feature_obs, 
+    void ComputeOnePointResidualJacobian(const FeatureObservation& one_feature_obs, 
                                          const int state_size,
                                          Eigen::VectorXd* residual, 
                                          Eigen::MatrixXd* Hx,
                                          Eigen::Matrix<double, Eigen::Dynamic, 3>* Hf);
 
-    void ComputeVisualResidualJacobian(const std::vector<Updater::FeatureObservation>& features_full_obs, 
+    void ComputeVisualResidualJacobian(const std::vector<FeatureObservation>& features_full_obs, 
                                        const int state_size,
                                        Eigen::VectorXd* res, 
                                        Eigen::MatrixXd* Jacobian);

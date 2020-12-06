@@ -64,13 +64,15 @@ tracker_config.quality_level: 0.01
 tracker_config.min_dist: 40
 
 # Updater
-updater.visual_noise: 0.25
-updater.min_window_length: 1.
-updater.min_cam_dist_to_triangulate: 0.3
-updater.min_res_size: 4
-updater.plane_rot_noise: 1e-6
-updater.plane_trans_noise: 0.01
+visual_updater.visual_noise: 0.25
+visual_updater.min_window_length: 1.
+visual_updater.min_cam_dist_to_triangulate: 0.3
+visual_updater.min_res_size: 4
+
+plane_updater.plane_rot_noise: 1e-6
+plane_updater.plane_trans_noise: 0.01
 
 # System config.
 sys_config.sliding_window_size: 10
-sys_config.compute_raw_odom: true
+sys_config.compute_raw_odom: 1
+sys_config.enable_plane_update: 1

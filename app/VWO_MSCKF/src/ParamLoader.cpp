@@ -64,17 +64,20 @@ void LoadParam(const std::string& param_file, Parameter* params) {
     params->tracker_config.quality_level = cv_params["tracker_config.quality_level"];
     params->tracker_config.min_dist = cv_params["tracker_config.min_dist"];
 
-    // Updater
-    params->updater_config.visual_noise = cv_params["updater.visual_noise"];
-    params->updater_config.min_window_length = cv_params["updater.min_window_length"];
-    params->updater_config.min_cam_dist_to_triangulate = cv_params["updater.min_cam_dist_to_triangulate"];
-    params->updater_config.min_res_size = cv_params["updater.min_res_size"];
-    params->updater_config.plane_rot_noise = cv_params["updater.plane_rot_noise"];
-    params->updater_config.plane_trans_noise = cv_params["updater.plane_trans_noise"];
+    // Visual Updater
+    params->visual_updater_config.visual_noise = cv_params["visual_updater.visual_noise"];
+    params->visual_updater_config.min_window_length = cv_params["visual_updater.min_window_length"];
+    params->visual_updater_config.min_cam_dist_to_triangulate = cv_params["visual_updater.min_cam_dist_to_triangulate"];
+    params->visual_updater_config.min_res_size = cv_params["visual_updater.min_res_size"];
+    
+    // Plane Updater
+    params->plane_updater_config.plane_rot_noise = cv_params["plane_updater.plane_rot_noise"];
+    params->plane_updater_config.plane_trans_noise = cv_params["plane_updater.plane_trans_noise"];
 
     // System config.
     params->sys_config.sliding_window_size = cv_params["sys_config.sliding_window_size"];
     cv_params["sys_config.compute_raw_odom"] >> params->sys_config.compute_raw_odom;
+    cv_params["sys_config.enable_plane_update"] >> params->sys_config.enable_plane_update;
 }
 
 }  // namespace VWO

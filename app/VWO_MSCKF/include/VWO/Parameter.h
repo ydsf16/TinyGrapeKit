@@ -3,7 +3,8 @@
 #include <Eigen/Core>
 
 #include <VWO/Visualizer.h>
-#include <VWO/Updater.h>
+#include <VWO/VisualUpdater.h>
+#include "VWO/PlaneUpdater.h"
 #include <TGK/Geometry/Triangulator.h>
 #include <TGK/ImageProcessor/KLTFeatureTracker.h>
 
@@ -41,6 +42,7 @@ struct ExtrinsicParam {
 struct SysConfig {
     int sliding_window_size;
     bool compute_raw_odom;
+    bool enable_plane_update;
 };
 
 struct Parameter {
@@ -54,7 +56,8 @@ struct Parameter {
     Visualizer::Config viz_config;
     TGK::Geometry::Triangulator::Config tri_config;
     TGK::ImageProcessor::KLTFeatureTracker::Config tracker_config;
-    Updater::Config updater_config;
+    VisualUpdater::Config visual_updater_config;
+    PlaneUpdater::Config plane_updater_config;
 
     SysConfig sys_config;
 };

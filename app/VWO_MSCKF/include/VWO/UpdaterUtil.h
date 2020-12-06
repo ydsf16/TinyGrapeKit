@@ -22,7 +22,4 @@ void EKFUpdate(const Eigen::MatrixXd& H,
                const Eigen::MatrixXd& V,
                State* state);
 
-void ComputePlaneConstraintResidualJacobian(const Eigen::Matrix3d& G_R_O, const Eigen::Vector3d& G_p_O,
-                                            Eigen::Vector3d* res, Eigen::Matrix<double, 3, 6>* H);
-
 } // namespace VWO

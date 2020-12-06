@@ -16,7 +16,8 @@
 #include <VWO/Parameter.h>
 #include <VWO/Propagator.h>
 #include <VWO/State.h>
-#include <VWO/Updater.h>
+#include <VWO/VisualUpdater.h>
+#include <VWO/PlaneUpdater.h>
 #include <VWO/Visualizer.h>
 
 namespace VWO {
@@ -26,6 +27,8 @@ public:
     struct Config {
         int sliding_window_size_ = 10;
         bool compute_raw_odom_ =  true;
+
+        bool enable_plane_update = true;
     };
 
     VWOSystem(const std::string& param_file);
@@ -49,7 +52,8 @@ private:
     std::unique_ptr<Initializer> initializer_;
     std::unique_ptr<Visualizer> viz_;
     std::unique_ptr<Propagator> propagator_;
-    std::unique_ptr<Updater> updater_;
+    std::unique_ptr<VisualUpdater> visual_updater_;
+    std::unique_ptr<PlaneUpdater> plane_updater_ = nullptr;
     std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker_;
     std::shared_ptr<TGK::ImageProcessor::SimFeatureTrakcer> sim_feature_tracker_; 
 
