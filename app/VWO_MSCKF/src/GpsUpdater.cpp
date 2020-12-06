@@ -182,8 +182,13 @@ bool GpsUpdater::UpdateState(const TGK::BaseType::GpsDataConstPtr gps_data, Stat
         Hx.block<3, 6>(0, frame_a->state_idx) = J_wrt_Ta;
         Hx.block<3, 6>(0, frame_b->state_idx) = J_wrt_Tb;
 
+        // TODO: Adjust noise.
+        Eigen::Matrix3d cov = cur_gps_data->cov;
+        cov *= 0.1;
+        cov(2, 2) = 1e6; // Do not use height.
+
         /// EKF update.
-        EKFUpdate(Hx, res, cur_gps_data->cov, state);
+        EKFUpdate(Hx, res, cov, state);
     }
 
     return true;

@@ -98,7 +98,7 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
 
             // Use bigger covariance.
             state_.covariance.block<3, 3>(3, 3) = latest_gps_data_->cov;
-            state_.covariance(2, 2) = 10. * 10. * kDeg2Rad * kDeg2Rad;
+            state_.covariance(2, 2) = 180. * 180. * kDeg2Rad * kDeg2Rad;
 
             // Set init lon lat heig for gps updater.
             gps_updater_->SetInitLonLatHei(latest_gps_data_->lon_lat_hei);
@@ -232,7 +232,11 @@ bool VWOSystem::FeedGpsData(const double timestamp, const double longitude, cons
     // Draw raw gps data.
     Eigen::Vector3d init_llh;
     if (gps_updater_->GetInitLonLatHei(&init_llh)) {
-        const Eigen::Vector3d G_p_Gps = ConvertLonLatHeiToENU(init_llh, gps_data_ptr->lon_lat_hei);
+        Eigen::Vector3d G_p_Gps = ConvertLonLatHeiToENU(init_llh, gps_data_ptr->lon_lat_hei);
+
+        // TODO: Do not use height.
+        G_p_Gps[2] = 0.;
+
         viz_->DrawGps(G_p_Gps);
     }
 
