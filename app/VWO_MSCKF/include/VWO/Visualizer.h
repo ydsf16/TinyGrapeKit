@@ -29,8 +29,12 @@ public:
 
         int max_traj_length = 100000;
         int max_num_features = 5000;
+        
         int max_gps_length = 10000;
         double gps_point_size = 5.;
+
+        bool show_raw_odom = true;
+        bool show_gps_points = true;
     };
 
     Visualizer(const Config& config);

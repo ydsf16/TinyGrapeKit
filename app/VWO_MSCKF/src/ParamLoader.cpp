@@ -57,6 +57,10 @@ void LoadParam(const std::string& param_file, Parameter* params) {
     params->viz_config.img_width = cv_params["viz_config.img_width"];
     params->viz_config.max_traj_length = cv_params["viz_config.max_traj_length"];
     params->viz_config.max_num_features = cv_params["viz_config.max_num_features"];
+    params->viz_config.max_gps_length = cv_params["viz_config.max_gps_length"];
+    params->viz_config.gps_point_size = cv_params["viz_config.gps_point_size"];
+    cv_params["viz_config.show_raw_odom"] >> params->viz_config.show_raw_odom;
+    cv_params["viz_config.show_gps_points"] >> params->viz_config.show_gps_points;
 
     // Triangulator
     params->tri_config.max_proj_res = cv_params["tri_config.max_proj_res"];

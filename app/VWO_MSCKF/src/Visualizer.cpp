@@ -217,7 +217,8 @@ void Visualizer::Run() {
     pangolin::Var<bool> show_cam("menu.Show Camera", true, true);
     pangolin::Var<bool> show_traj("menu.Show Traj", true, true);
     pangolin::Var<bool> show_gt_traj("menu.Show GroundTruth", true, true);
-    pangolin::Var<bool> show_raw_odom("menu.Show Raw Odom", true, true);
+    pangolin::Var<bool> show_raw_odom("menu.Show Raw Odom", config_.show_raw_odom, true);
+    pangolin::Var<bool> show_gps_point("menu.Show GPS", config_.show_gps_points, true);
 
     // Define Camera Render Object (for view / scene browsing)
     pangolin::OpenGlRenderState s_cam(
@@ -290,8 +291,10 @@ void Visualizer::Run() {
         }
 
         // Draw Gps points.
-        glColor3f(0.0f, 1.0f, 1.0f);
-        DrawGpsPoints();
+        if (show_gps_point.Get()) {
+            glColor3f(0.0f, 1.0f, 1.0f);
+            DrawGpsPoints();
+        }
 
         // Draw image
         {

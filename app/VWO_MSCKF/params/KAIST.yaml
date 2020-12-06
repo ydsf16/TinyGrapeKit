@@ -59,6 +59,11 @@ viz_config.img_width: 320
 viz_config.max_traj_length: 100000
 viz_config.max_num_features: 1000
 
+viz_config.max_gps_length: 10000
+viz_config.gps_point_size: 5.
+viz_config.show_raw_odom: 0
+viz_config.show_gps_points: 1
+
 # Triangulator
 tri_config.max_proj_res: 5.
 tri_config.min_dist: 0.1
