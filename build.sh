@@ -1,6 +1,15 @@
-## Build third party.
+## Build third party -- Pangolin
 cd third_party
 cd Pangolin
+rm -rf build
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j8
+
+## Build third party -- GeographicLib
+cd ../../
+cd GeographicLib
 rm -rf build
 mkdir build
 cd build
