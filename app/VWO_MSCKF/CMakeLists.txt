@@ -4,6 +4,7 @@ project(VWO_MSCKF)
 # Set C++14
 add_compile_options(-std=c++14)
 
+
 # Set cmake
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
@@ -27,6 +28,11 @@ include_directories(${Pangolin_DIR}/include)
 include_directories(${Pangolin_DIR}/build/src/include)
 link_directories(${Pangolin_DIR}/build/src)
 
+# GeographicLib
+set(GeoGraphic_DIR ${CMAKE_SOURCE_DIR}/../../third_party/GeographicLib)
+include_directories(${GeoGraphic_DIR}/include)
+link_directories(${GeoGraphic_DIR}/build)
+
 # Make library
 file(GLOB_RECURSE ALL_HEADER_FILES
     ${PROJECT_SOURCE_DIR}/include/*.h
@@ -37,7 +43,7 @@ file(GLOB_RECURSE ALL_SRC_FILES
 include_directories(include)
 
 add_library(${PROJECT_NAME} SHARED ${ALL_SRC_FILES} ${ALL_HEADER_FILES})
-target_link_libraries(${PROJECT_NAME} TinyGrapeKit pangolin)
+target_link_libraries(${PROJECT_NAME} TinyGrapeKit pangolin libGeographiccc)
 
 ## Declare C++ executables
 add_executable(RunKAISTData example/RunKAISTData.cpp)
@@ -54,5 +60,3 @@ target_link_libraries(TestVisualWheelCircleSim
     ${catkin_LIBRARIES}
     ${PROJECT_NAME} glog ${OpenCV_LIBS} TinyGrapeKit 
 )
-
-

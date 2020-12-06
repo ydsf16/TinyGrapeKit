@@ -53,9 +53,15 @@ VWOSystem::VWOSystem(const std::string& param_file)
     sim_feature_tracker_ = std::make_shared<TGK::ImageProcessor::SimFeatureTrakcer>();  
 
     visual_updater_ = std::make_unique<VisualUpdater>(param_.visual_updater_config, camera_, feature_tracker_, triangulator);
+    
     if (config_.enable_plane_update) {
         plane_updater_ = std::make_unique<PlaneUpdater>(param_.plane_updater_config);
     } 
+
+    if (config_.enable_gps_update) {
+        const Eigen::Vector3d C_p_Gps = Eigen::Vector3d::Zero();
+        gps_updater_ = std::make_unique<GpsUpdater>(C_p_Gps);
+    }
 
     viz_ = std::make_unique<Visualizer>(param_.viz_config);
 
@@ -82,6 +88,22 @@ bool VWOSystem::FeedWheelData(const double timestamp, const double left, const d
     // Initialize.
     if (!initialized_) {
         initializer_->Initialize(img_ptr->timestamp, &state_);
+
+        // Adjust initialization for GPS Updater.
+        if (config_.enable_gps_update) {
+            if (latest_gps_data_ == nullptr || 
+                std::abs(latest_gps_data_->timestamp - img_ptr->timestamp) > 0.5) {
+                return true;
+            }
+
+            // Use bigger covariance.
+            state_.covariance.block<3, 3>(3, 3) = latest_gps_data_->cov;
+            state_.covariance(2, 2) = 10. * 10. * kDeg2Rad * kDeg2Rad;
+
+            // Set init lon lat heig for gps updater.
+            gps_updater_->SetInitLonLatHei(latest_gps_data_->lon_lat_hei);
+        } // For gps initialization.
+
         initialized_ = true;
         return true;
     }
@@ -192,6 +214,29 @@ bool VWOSystem::FeedSimData(const double timestamp, const cv::Mat& image,
 
     // Sync with wheel data.
     data_sync_->FeedMonoImageData(sim_img_ptr);
+    return true;
+}
+
+bool VWOSystem::FeedGpsData(const double timestamp, const double longitude, const double latitude, const double height,
+                 const Eigen::Matrix3d& cov) {
+    if (!config_.enable_gps_update) {
+        LOG(ERROR) << "[FeedGpsData]: Gps update not enabled.";
+        return false;
+    }
+
+    const TGK::BaseType::GpsDataPtr gps_data_ptr = std::make_shared<TGK::BaseType::GpsData>();
+    gps_data_ptr->timestamp = timestamp;
+    gps_data_ptr->lon_lat_hei << longitude, latitude, height;
+    gps_data_ptr->cov = cov;
+
+    if (!initialized_) {
+        latest_gps_data_ = gps_data_ptr;
+        LOG(WARNING) << "[FeedGpsData]: System not initialized.";
+        return false;
+    }
+
+    gps_updater_->UpdateState(gps_data_ptr, &state_);
+
     return true;
 }
 

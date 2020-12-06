@@ -18,6 +18,7 @@
 #include <VWO/State.h>
 #include <VWO/VisualUpdater.h>
 #include <VWO/PlaneUpdater.h>
+#include <VWO/GpsUpdater.h>
 #include <VWO/Visualizer.h>
 
 namespace VWO {
@@ -29,6 +30,7 @@ public:
         bool compute_raw_odom_ =  true;
 
         bool enable_plane_update = true;
+        bool enable_gps_update = true;
     };
 
     VWOSystem(const std::string& param_file);
@@ -36,6 +38,9 @@ public:
     bool FeedWheelData(const double timestamp, const double left, const double right);
 
     bool FeedImageData(const double timestamp, const cv::Mat& image);
+
+    bool FeedGpsData(const double timestamp, const double longitude, const double latitude, const double height,
+                     const Eigen::Matrix3d& cov);
 
     bool FeedSimData(const double timestamp, const cv::Mat& image, 
                      const std::vector<Eigen::Vector2d>& features,
@@ -54,6 +59,7 @@ private:
     std::unique_ptr<Propagator> propagator_;
     std::unique_ptr<VisualUpdater> visual_updater_;
     std::unique_ptr<PlaneUpdater> plane_updater_ = nullptr;
+    std::unique_ptr<GpsUpdater> gps_updater_ = nullptr;
     std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker_;
     std::shared_ptr<TGK::ImageProcessor::SimFeatureTrakcer> sim_feature_tracker_; 
 
@@ -68,6 +74,9 @@ private:
     Eigen::Matrix3d odom_G_R_O_;
     Eigen::Vector3d odom_G_p_O_;
     std::unique_ptr<TGK::WheelProcessor::WheelPropagator> wheel_propagator_;
+
+    // JUST FOR INITIALIZATION.
+    TGK::BaseType::GpsDataConstPtr latest_gps_data_ = nullptr;
 };
 
 }  // namespace VWO

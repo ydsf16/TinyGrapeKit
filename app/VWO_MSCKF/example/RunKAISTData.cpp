@@ -7,10 +7,10 @@
 #include <VWO/Visualizer.h>
 #include <VWO/VWOSystem.h>
 
-bool LoadEncoderData(const std::string& encoder_file_path, std::unordered_map<std::string, std::string>* time_encoder_map) {
+bool LoadSensorData(const std::string& encoder_file_path, std::unordered_map<std::string, std::string>* time_data_map) {
     std::ifstream encoder_file(encoder_file_path);
     if (!encoder_file.is_open()) {
-        LOG(ERROR) << "[LoadEncoderData]: Failed to open encoder file.";
+        LOG(ERROR) << "[LoadSensorData]: Failed to open encoder file.";
         return false;
     } 
 
@@ -18,11 +18,11 @@ bool LoadEncoderData(const std::string& encoder_file_path, std::unordered_map<st
     while (std::getline(encoder_file, line_str)) {
         std::stringstream ss(line_str);
         if (!std::getline(ss, time_str, ',')) {
-            LOG(ERROR) << "[LoadEncoderData]: Find a bad line in the encoder file.: " << line_str;
+            LOG(ERROR) << "[LoadSensorData]: Find a bad line in the encoder file.: " << line_str;
             return false;
         }
 
-        time_encoder_map->emplace(time_str, line_str);
+        time_data_map->emplace(time_str, line_str);
     }
 
     return true;
@@ -45,8 +45,15 @@ int main(int argc, char** argv) {
    
     // Load all encoder data to buffer.
     std::unordered_map<std::string, std::string> time_encoder_map;
-    if (!LoadEncoderData(data_folder + "/sensor_data/encoder.csv", &time_encoder_map)) {
+    if (!LoadSensorData(data_folder + "/sensor_data/encoder.csv", &time_encoder_map)) {
         LOG(ERROR) << "[main]: Failed to load encoder data.";
+        return EXIT_FAILURE;
+    } 
+
+    // Load all gps data to buffer.
+    std::unordered_map<std::string, std::string> time_gps_map;
+    if (!LoadSensorData(data_folder + "/sensor_data/gps.csv", &time_gps_map)) {
+        LOG(ERROR) << "[main]: Failed to load gps data.";
         return EXIT_FAILURE;
     } 
 
@@ -104,6 +111,29 @@ int main(int argc, char** argv) {
 
             // Feed wheel data to system.
             vwo_sys.FeedWheelData(timestamp, left_enc_cnt, right_enc_cnt);
+        }
+
+        if (sensor_type == "gps") {
+            if (time_gps_map.find(time_str) == time_gps_map.end()) {
+                LOG(ERROR) << "[main]: Failed to find gps data at time: " << time_str;
+                return EXIT_FAILURE;
+            }
+            const std::string& gps_str = time_gps_map.at(time_str);
+            std::stringstream gps_ss(gps_str);
+            line_data_vec.clear();
+            while (std::getline(gps_ss, value_str, ',')) { line_data_vec.push_back(value_str); }
+
+            const double lat = std::stod(line_data_vec[1]);
+            const double lon = std::stod(line_data_vec[2]);
+            const double hei = std::stod(line_data_vec[3]);
+
+            Eigen::Matrix3d cov;
+            for (size_t i = 0; i < 9; ++i) {
+                cov.data()[i] = std::stod(line_data_vec[4+i]);
+            }
+            
+            // Feed gps data to system.
+            vwo_sys.FeedGpsData(timestamp, lon, lat, hei, cov);
         }
     }
 
