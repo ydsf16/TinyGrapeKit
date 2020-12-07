@@ -26,7 +26,7 @@ sys_config.enable_plane_update: 1
 sys_config.enable_gps_updater: 1
 ```
 
-![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/Visual-Wheel-GNSS Localization.png)
+![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/Visual-Wheel-GNSS-Localization.png)
 ![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/VWO-MSCKF.png)
 ![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/SIM.png)
 
