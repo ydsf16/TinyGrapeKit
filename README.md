@@ -23,7 +23,7 @@ For details, please refer to: https://zhuanlan.zhihu.com/p/270670373 and https:/
 You can select the sensors to participate in the fusion through the configuration file.
 ```
 sys_config.enable_plane_update: 1
-sys_config.enable_gps_updater: 1
+sys_config.enable_gps_update: 1
 ```
 
 ![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/Visual-Wheel-GNSS-Localization.png)
