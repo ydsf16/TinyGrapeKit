@@ -15,13 +15,13 @@ chmod +x build.sh
 ```
 
 # Applications in the **app** folder
-## VWO-MSCKF : MSCKF Based Visual Wheel Odometry. 
-An odometry algorithm by fusing visual and wheel information in an Extended Kalman Filter.
+## FilterFusion : Filter-Base Sensor Fusion. 
+Fusion wheel, visual, and GNss in an Extended Kalman Filter.
 
-For details, please refer to: https://zhuanlan.zhihu.com/p/270670373
+For details, please refer to: https://zhuanlan.zhihu.com/p/270670373 and https://zhuanlan.zhihu.com/p/330880853
 
-![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/VWO_MSCKF/doc/KAIST.png)
-![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/VWO_MSCKF/doc/SIM.png)
+![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/KAIST.png)
+![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/SIM.png)
 
 ### Dataset 
 We used the KAIST dataset to test our method. https://irap.kaist.ac.kr/dataset/
@@ -29,7 +29,7 @@ We used the KAIST dataset to test our method. https://irap.kaist.ac.kr/dataset/
 ### Example
 For examples, please refer to the **Example** folder.
 ```
-./RunKAISTData ${REPO_PATH}/TinyGrapeKit/app/VWO_MSCKF/params/KAIST.yaml ${KAIST_PATH}
+./RunKAISTData ${REPO_PATH}/TinyGrapeKit/app/FilterFusion/params/KAIST.yaml ${KAIST_PATH}
 ```
 
 # Contact us

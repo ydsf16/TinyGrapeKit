@@ -25,9 +25,9 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make install -j8
 
-## Build VWO-MSCKF
+## Build FilterFusion
 cd ../../
-cd app/VWO_MSCKF
+cd app/FilterFusion
 rm -rf build
 mkdir build
 cd build
