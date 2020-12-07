@@ -15,10 +15,11 @@ chmod +x build.sh
 ```
 
 # Applications in the **app** folder
-## FilterFusion : Filter-Base Sensor Fusion. 
+## FilterFusion : Filter-Based Sensor Fusion. 
 Fuse wheel, visual, and GNSS in an Extended Kalman Filter.
 
-For details, please refer to: https://zhuanlan.zhihu.com/p/270670373 and https://zhuanlan.zhihu.com/p/330880853
+For visual-wheel fusion, please refer to: https://zhuanlan.zhihu.com/p/270670373
+For fusing of GNSS data, please refer to: https://zhuanlan.zhihu.com/p/330880853
 
 You can select the sensors to participate in the fusion through the configuration file.
 ```
