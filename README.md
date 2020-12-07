@@ -16,11 +16,18 @@ chmod +x build.sh
 
 # Applications in the **app** folder
 ## FilterFusion : Filter-Base Sensor Fusion. 
-Fusion wheel, visual, and GNss in an Extended Kalman Filter.
+Fuse wheel, visual, and GNSS in an Extended Kalman Filter.
 
 For details, please refer to: https://zhuanlan.zhihu.com/p/270670373 and https://zhuanlan.zhihu.com/p/330880853
 
-![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/KAIST.png)
+You can select the sensors to participate in the fusion through the configuration file.
+```
+sys_config.enable_plane_update: 1
+sys_config.enable_gps_updater: 1
+```
+
+![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/Visual-Wheel-GNSS Localization.png)
+![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/VWO-MSCKF.png)
 ![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/SIM.png)
 
 ### Dataset 

@@ -22,6 +22,7 @@ FilterFusionSystem::FilterFusionSystem(const std::string& param_file)
     config_.compute_raw_odom_ = param_.sys_config.compute_raw_odom;
     config_.sliding_window_size_ = param_.sys_config.sliding_window_size;
     config_.enable_plane_update = param_.sys_config.enable_plane_update;
+    config_.enable_gps_update = param_.sys_config.enable_gps_update;
 
     /// Initialize all modules.
     data_sync_ = std::make_unique<TGK::DataSynchronizer::WheelImageSynchronizer>();

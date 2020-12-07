@@ -86,6 +86,8 @@ void LoadParam(const std::string& param_file, Parameter* params) {
     params->sys_config.sliding_window_size = cv_params["sys_config.sliding_window_size"];
     cv_params["sys_config.compute_raw_odom"] >> params->sys_config.compute_raw_odom;
     cv_params["sys_config.enable_plane_update"] >> params->sys_config.enable_plane_update;
+    cv_params["sys_config.enable_gps_update"] >> params->sys_config.enable_gps_update;
+    
 }
 
 }  // namespace FilterFusion

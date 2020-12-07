@@ -45,6 +45,7 @@ struct SysConfig {
     int sliding_window_size;
     bool compute_raw_odom;
     bool enable_plane_update;
+    bool enable_gps_update;
 };
 
 struct Parameter {

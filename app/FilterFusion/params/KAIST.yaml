@@ -87,3 +87,4 @@ plane_updater.plane_trans_noise: 0.01
 sys_config.sliding_window_size: 10
 sys_config.compute_raw_odom: 1
 sys_config.enable_plane_update: 1
+sys_config.enable_gps_update: 1
