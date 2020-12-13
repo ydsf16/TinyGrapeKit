@@ -43,6 +43,20 @@ Extrinsic.C_p_Gps: !!opencv-matrix
    dt: d
    data: [ 0.247401, -0.20, -1.96 ]
 
+Extrinsic.C_R_I: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ -0.00680499000000, -0.99997700000000, -0.00023038300000,
+           -0.01532150000000, 0.00033462700000, -0.99988300000000,
+            0.99985000000000, -0.00680066000000, -0.01532340000000]
+
+Extrinsic.C_p_I: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [ 0.25902140751723, -0.08972284453943, -1.71222648024134 ]
+
 # Visualization
 viz_config.cam_size: 1.5
 viz_config.cam_line_width: 3.
@@ -87,5 +101,5 @@ plane_updater.plane_trans_noise: 0.01
 sys_config.sliding_window_size: 10
 sys_config.compute_raw_odom: 1
 sys_config.enable_plane_update: 1
-sys_config.enable_gps_update: 1
+sys_config.enable_gps_update: 0
 sys_config.enable_imu_update: 1

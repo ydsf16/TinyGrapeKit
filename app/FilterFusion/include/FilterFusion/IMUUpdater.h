@@ -10,8 +10,8 @@ namespace FilterFusion {
 class IMUUpdater {
 public:
     struct Config {
-        double acc_noise = 1e-8;
-        double gyro_noise = 1e-12;
+        double acc_noise = 1.;
+        double gyro_noise = 1e-4;
         double gravity = 9.8015; // m/s^2
     };
 
@@ -21,8 +21,8 @@ public:
 
 private:
     bool UpdateUsingIMUVector(const std::vector<TGK::BaseType::IMUDataConstPtr>& imu_vec,
-                              GyroBias* gyro_bias, AccBias* acc_bias, 
-                              CameraFrame* cam1, CameraFrame* cam2, CameraFrame* cam3, CameraFrame* cam4);
+                              CameraFrame* cam1, CameraFrame* cam2, CameraFrame* cam3, CameraFrame* cam4,
+                              State* state);
 
     const Config config_;
     Eigen::Matrix3d C_R_I_;

@@ -31,6 +31,21 @@ bool LoadSensorData(const std::string& encoder_file_path, std::unordered_map<std
 // 1. Config file.
 // 2. Dataset folder.
 int main(int argc, char** argv) {
+    // Eigen::Matrix3d V_R_I = Eigen::Matrix3d::Identity();
+    // Eigen::Vector3d V_p_I(-0.07, 0, 1.7);
+    // Eigen::Matrix3d V_R_C;
+    // V_R_C << -0.00680499, -0.0153215, 0.99985,
+    //          -0.999977, 0.000334627, -0.00680066,
+    //          -0.000230383, -0.999883, -0.0153234;
+    // Eigen::Vector3d V_p_C(1.64239, 0.247401, 1.58411);
+    
+    // Eigen::Matrix3d C_R_I = V_R_C.transpose() * V_R_I;
+    // Eigen::Vector3d C_p_I = V_R_C.transpose() * (V_p_I - V_p_C);
+
+    // LOG(ERROR) << std::fixed << std::setprecision(14) << "\n" << C_R_I;
+    // LOG(ERROR) << std::fixed <<  std::setprecision(14) << "\n" << C_p_I;
+    // return EXIT_FAILURE;
+    
     if (argc != 3) {
         LOG(ERROR) << "[main]: Please input param_file, data_folder.";
         return EXIT_FAILURE;
