@@ -13,7 +13,8 @@ enum class MeasureType {
     kWheel,
     kMonoImage,
     kSimMonoImage,
-    kGNSS
+    kGNSS,
+    kIMU
 };
 
 struct Measurement {
@@ -69,6 +70,18 @@ struct GpsData : public Measurement {
 };
 using GpsDataConstPtr = std::shared_ptr<const GpsData>;
 using GpsDataPtr = std::shared_ptr<GpsData>;
+
+struct IMUData : public Measurement {
+    IMUData() {
+        type = MeasureType::kIMU;
+    }
+    ~IMUData() override = default;
+
+    Eigen::Vector3d acc; // m/s^2.
+    Eigen::Vector3d gyro; // rad/s.
+};
+using IMUDataConstPtr = std::shared_ptr<const IMUData>;
+using IMUDataPtr = std::shared_ptr<IMUData>;
 
 }  // namespace BaseType
 }  // namespace TGK
