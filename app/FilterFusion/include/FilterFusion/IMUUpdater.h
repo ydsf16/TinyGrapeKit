@@ -23,7 +23,7 @@ private:
     bool UpdateUsingIMUVector(const std::vector<TGK::BaseType::IMUDataConstPtr>& imu_vec,
                               GyroBias* gyro_bias, AccBias* acc_bias, 
                               CameraFrame* cam1, CameraFrame* cam2, CameraFrame* cam3, CameraFrame* cam4);
-                          
+
     const Config config_;
     Eigen::Matrix3d C_R_I_;
     Eigen::Vector3d C_p_I_;
