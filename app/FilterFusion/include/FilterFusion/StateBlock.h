@@ -82,4 +82,22 @@ struct WheelIntrinsic : public StateBlock {
     }
 };
 
+struct AccBias : public StateBlock {
+    AccBias() { size = 3; }
+    Eigen::Vector3d ba;
+
+    void Update(const Eigen::Vector3d& delta_x) {
+        ba = ba.eval() + delta_x;
+    }
+};
+
+struct GyroBias : public StateBlock {
+    GyroBias() { size = 3; }
+    Eigen::Vector3d bg;
+    
+    void Update(const Eigen::Vector3d& delta_x) {
+        bg = bg.eval() + delta_x;
+    }
+ };
+
 }  // namespace FilterFusion

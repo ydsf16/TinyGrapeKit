@@ -20,11 +20,18 @@ struct State {
     WheelPose wheel_pose;
     // Camera poses.
     std::deque<CameraFramePtr> camera_frames;
+    // IMU bias.
+    GyroBias gyro_bias;
+    AccBias acc_bias;
 
     // Covariance.
     Eigen::MatrixXd covariance;
 
     void Update(const Eigen::VectorXd& delta_x) {
+        // TODO: Redesign state struct.
+        gyro_bias.Update(delta_x.segment(gyro_bias.state_idx, gyro_bias.size));
+        acc_bias.Update(delta_x.segment(acc_bias.state_idx, acc_bias.size));
+
         // Update Wheel_pose.
         wheel_pose.Update(delta_x.segment(wheel_pose.state_idx, wheel_pose.size));
 

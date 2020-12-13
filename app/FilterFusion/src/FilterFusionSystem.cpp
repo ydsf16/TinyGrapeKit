@@ -92,7 +92,7 @@ bool FilterFusionSystem::FeedWheelData(const double timestamp, const double left
 
     // Initialize.
     if (!initialized_) {
-        initializer_->Initialize(img_ptr->timestamp, &state_);
+        initializer_->Initialize(img_ptr->timestamp, config_.enable_imu_update, &state_);
 
         // Adjust initialization for GPS Updater.
         if (config_.enable_gps_update) {
