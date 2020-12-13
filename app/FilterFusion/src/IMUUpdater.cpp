@@ -44,10 +44,8 @@ bool IMUUpdater::UpdateState(const TGK::BaseType::IMUDataConstPtr imu_data, Stat
         }
     }
 
-    // Update using IMUs.
-    LOG(ERROR) << "[]: Vec time: " << std::fixed << imu_vec.size()
-               << ", " << imu_vec.front()->timestamp << ", "
-               << imu_vec.back()->timestamp;
+    // Update using IMU.
+    
 
     // Remove all used ims.
     while (!imu_buffer_.empty() && imu_buffer_.front()->timestamp <= cam3->timestamp) {

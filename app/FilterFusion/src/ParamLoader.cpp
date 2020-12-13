@@ -87,7 +87,9 @@ void LoadParam(const std::string& param_file, Parameter* params) {
     cv_params["sys_config.compute_raw_odom"] >> params->sys_config.compute_raw_odom;
     cv_params["sys_config.enable_plane_update"] >> params->sys_config.enable_plane_update;
     cv_params["sys_config.enable_gps_update"] >> params->sys_config.enable_gps_update;
+    cv_params["sys_config.enable_imu_update"] >> params->sys_config.enable_imu_update;
     
+    // TODO: IMU UPDATER.
 }
 
 }  // namespace FilterFusion

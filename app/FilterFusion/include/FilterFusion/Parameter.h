@@ -4,7 +4,8 @@
 
 #include <FilterFusion/Visualizer.h>
 #include <FilterFusion/VisualUpdater.h>
-#include "FilterFusion/PlaneUpdater.h"
+#include <FilterFusion/PlaneUpdater.h>
+#include <FilterFusion/IMUUpdater.h>
 #include <TGK/Geometry/Triangulator.h>
 #include <TGK/ImageProcessor/KLTFeatureTracker.h>
 
@@ -46,6 +47,7 @@ struct SysConfig {
     bool compute_raw_odom;
     bool enable_plane_update;
     bool enable_gps_update;
+    bool enable_imu_update;
 };
 
 struct Parameter {
@@ -61,6 +63,7 @@ struct Parameter {
     TGK::ImageProcessor::KLTFeatureTracker::Config tracker_config;
     VisualUpdater::Config visual_updater_config;
     PlaneUpdater::Config plane_updater_config;
+    IMUUpdater::Config imu_updater_config;
 
     SysConfig sys_config;
 };

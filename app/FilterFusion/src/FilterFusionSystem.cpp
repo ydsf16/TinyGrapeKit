@@ -23,6 +23,7 @@ FilterFusionSystem::FilterFusionSystem(const std::string& param_file)
     config_.sliding_window_size_ = param_.sys_config.sliding_window_size;
     config_.enable_plane_update = param_.sys_config.enable_plane_update;
     config_.enable_gps_update = param_.sys_config.enable_gps_update;
+    config_.enable_imu_update = param_.sys_config.enable_imu_update;
 
     /// Initialize all modules.
     data_sync_ = std::make_unique<TGK::DataSynchronizer::WheelImageSynchronizer>();
@@ -61,6 +62,10 @@ FilterFusionSystem::FilterFusionSystem(const std::string& param_file)
 
     if (config_.enable_gps_update) {
         gps_updater_ = std::make_unique<GpsUpdater>(param_.extrinsic.C_p_Gps);
+    }
+
+    if (config_.enable_imu_update) {
+        imu_updater_ = std::make_unique<IMUUpdater>(param_.imu_updater_config);
     }
 
     viz_ = std::make_unique<Visualizer>(param_.viz_config);
@@ -247,6 +252,29 @@ bool FilterFusionSystem::FeedGpsData(const double timestamp, const double longit
     }
 
     gps_updater_->UpdateState(gps_data_ptr, &state_);
+
+    return true;
+}
+
+bool FilterFusionSystem::FeedIMUData(const double timestamp, 
+                                     const double acc_x, const double acc_y, const double acc_z,
+                                     const double gyro_x, const double gyro_y, const double gyro_z) {
+    if (!config_.enable_imu_update) {
+        LOG(WARNING) << "[FeedIMUData]: IMU update not enabled.";
+        return false;
+    }
+
+    if (!initialized_) {
+        LOG(WARNING) << "[FeedIMUData]: System not initialized.";
+        return false;
+    }
+    
+    TGK::BaseType::IMUDataPtr imu_data_ptr = std::make_shared<TGK::BaseType::IMUData>();
+    imu_data_ptr->timestamp = timestamp;
+    imu_data_ptr->acc << acc_x, acc_y, acc_z;
+    imu_data_ptr->gyro << gyro_x, gyro_y, gyro_z;
+
+    imu_updater_->UpdateState(imu_data_ptr, &state_);
 
     return true;
 }

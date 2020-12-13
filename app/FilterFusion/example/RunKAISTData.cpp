@@ -36,12 +36,12 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    FLAGS_minloglevel = 3;
+    FLAGS_minloglevel = 2;
     const std::string param_file = argv[1];
     const std::string data_folder = argv[2];
 
     // Create FilterFusion system.
-    FilterFusion::FilterFusionSystem FilterFusion_sys(param_file);
+    FilterFusion::FilterFusionSystem fusion_sys(param_file);
    
     // Load all encoder data to buffer.
     std::unordered_map<std::string, std::string> time_encoder_map;
@@ -54,6 +54,13 @@ int main(int argc, char** argv) {
     std::unordered_map<std::string, std::string> time_gps_map;
     if (!LoadSensorData(data_folder + "/sensor_data/gps.csv", &time_gps_map)) {
         LOG(ERROR) << "[main]: Failed to load gps data.";
+        return EXIT_FAILURE;
+    } 
+
+    // Load all imu data to buffer.
+    std::unordered_map<std::string, std::string> time_imu_map;
+    if (!LoadSensorData(data_folder + "/sensor_data/xsens_imu.csv", &time_imu_map)) {
+        LOG(ERROR) << "[main]: Failed to load imu data.";
         return EXIT_FAILURE;
     } 
 
@@ -93,7 +100,7 @@ int main(int argc, char** argv) {
             cv::cvtColor(color_img, gray_img, cv::COLOR_RGB2GRAY);
 
             // Feed image to system.
-            FilterFusion_sys.FeedImageData(timestamp, gray_img);
+            fusion_sys.FeedImageData(timestamp, gray_img);
         }
 
         if (sensor_type == "encoder") {
@@ -110,7 +117,7 @@ int main(int argc, char** argv) {
             const double right_enc_cnt = std::stod(line_data_vec[2]);
 
             // Feed wheel data to system.
-            FilterFusion_sys.FeedWheelData(timestamp, left_enc_cnt, right_enc_cnt);
+            fusion_sys.FeedWheelData(timestamp, left_enc_cnt, right_enc_cnt);
         }
 
         if (sensor_type == "gps") {
@@ -133,7 +140,29 @@ int main(int argc, char** argv) {
             }
             
             // Feed gps data to system.
-            FilterFusion_sys.FeedGpsData(timestamp, lon, lat, hei, cov);
+            fusion_sys.FeedGpsData(timestamp, lon, lat, hei, cov);
+        }
+
+        if (sensor_type == "imu") {
+            if (time_imu_map.find(time_str) == time_imu_map.end()) {
+                LOG(ERROR) << "[main]: Failed to find imu data at time: " << time_str;
+                return EXIT_FAILURE;
+            }
+            const std::string& imu_str = time_imu_map.at(time_str);
+            std::stringstream imu_ss(imu_str);
+            line_data_vec.clear();
+            while (std::getline(imu_ss, value_str, ',')) { line_data_vec.push_back(value_str); }
+
+            const double acc_x = std::stod(line_data_vec[11]);
+            const double acc_y = std::stod(line_data_vec[12]);
+            const double acc_z = std::stod(line_data_vec[13]);
+
+            const double gyro_x = std::stod(line_data_vec[8]);
+            const double gyro_y = std::stod(line_data_vec[9]);
+            const double gyro_z = std::stod(line_data_vec[10]);
+
+            // Feed gps data to system.
+            fusion_sys.FeedIMUData(timestamp, acc_x, acc_y, acc_z, gyro_x, gyro_y, gyro_z);
         }
     }
 

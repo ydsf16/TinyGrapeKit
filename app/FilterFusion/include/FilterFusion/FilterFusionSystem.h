@@ -20,6 +20,7 @@
 #include <FilterFusion/PlaneUpdater.h>
 #include <FilterFusion/GpsUpdater.h>
 #include <FilterFusion/Visualizer.h>
+#include <FilterFusion/IMUUpdater.h>
 
 namespace FilterFusion {
 
@@ -31,6 +32,7 @@ public:
 
         bool enable_plane_update = true;
         bool enable_gps_update = true;
+        bool enable_imu_update = true;
     };
 
     FilterFusionSystem(const std::string& param_file);
@@ -41,6 +43,10 @@ public:
 
     bool FeedGpsData(const double timestamp, const double longitude, const double latitude, const double height,
                      const Eigen::Matrix3d& cov);
+
+    bool FeedIMUData(const double timestamp, 
+                     const double acc_x, const double acc_y, const double acc_z,
+                     const double gyro_x, const double gyro_y, const double gyro_z);
 
     bool FeedSimData(const double timestamp, const cv::Mat& image, 
                      const std::vector<Eigen::Vector2d>& features,
@@ -60,6 +66,7 @@ private:
     std::unique_ptr<VisualUpdater> visual_updater_;
     std::unique_ptr<PlaneUpdater> plane_updater_ = nullptr;
     std::unique_ptr<GpsUpdater> gps_updater_ = nullptr;
+    std::unique_ptr<IMUUpdater> imu_updater_ = nullptr;
     std::shared_ptr<TGK::ImageProcessor::FeatureTracker> feature_tracker_;
     std::shared_ptr<TGK::ImageProcessor::SimFeatureTrakcer> sim_feature_tracker_; 
 
