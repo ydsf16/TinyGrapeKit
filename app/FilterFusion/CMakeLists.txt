@@ -33,6 +33,15 @@ set(GeoGraphic_DIR ${CMAKE_SOURCE_DIR}/../../third_party/GeographicLib)
 include_directories(${GeoGraphic_DIR}/include)
 link_directories(${GeoGraphic_DIR}/build)
 
+# Sophus
+set(Sophus_DIR ${CMAKE_SOURCE_DIR}/../../third_party/Sophus)
+include_directories(${Sophus_DIR})
+link_directories(${Sophus_DIR}/build)
+
+# Basalt-Headers
+set(Basalt_DIR ${CMAKE_SOURCE_DIR}/../../third_party/basalt-headers)
+include_directories(${Basalt_DIR}/include)
+
 # Make library
 file(GLOB_RECURSE ALL_HEADER_FILES
     ${PROJECT_SOURCE_DIR}/include/*.h

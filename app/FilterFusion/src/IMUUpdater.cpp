@@ -2,9 +2,12 @@
 
 #include <glog/logging.h>
 
+#include <basalt/spline/so3_spline.h>
+
 namespace FilterFusion {
 
-IMUUpdater::IMUUpdater(const Config& config) : config_(config) { }
+IMUUpdater::IMUUpdater(const Eigen::Matrix3d& C_R_I, const Eigen::Vector3d& C_p_I, const Config& config) 
+    : C_R_I_(C_R_I), C_p_I_(C_p_I), config_(config) { }
 
 bool IMUUpdater::UpdateState(const TGK::BaseType::IMUDataConstPtr imu_data, State* state) {
     // Save imu data to buffer.
@@ -52,6 +55,14 @@ bool IMUUpdater::UpdateState(const TGK::BaseType::IMUDataConstPtr imu_data, Stat
         imu_buffer_.pop_front();
     }
     
+    return true;
+}
+
+bool IMUUpdater::UpdateUsingIMUVector(const std::vector<TGK::BaseType::IMUDataConstPtr>& imu_vec,
+                                      GyroBias* gyro_bias, AccBias* acc_bias, 
+                                      CameraFrame* cam1, CameraFrame* cam2, CameraFrame* cam3, CameraFrame* cam4) {
+    // First create the B-Spline.
+
     return true;
 }
 

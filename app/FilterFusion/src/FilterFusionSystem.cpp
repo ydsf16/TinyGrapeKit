@@ -65,7 +65,8 @@ FilterFusionSystem::FilterFusionSystem(const std::string& param_file)
     }
 
     if (config_.enable_imu_update) {
-        imu_updater_ = std::make_unique<IMUUpdater>(param_.imu_updater_config);
+        imu_updater_ = std::make_unique<IMUUpdater>(param_.extrinsic.C_R_I, param_.extrinsic.C_p_I,
+                                                    param_.imu_updater_config);
     }
 
     viz_ = std::make_unique<Visualizer>(param_.viz_config);

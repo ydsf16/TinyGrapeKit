@@ -40,6 +40,9 @@ struct ExtrinsicParam {
     Eigen::Vector3d O_p_C;
 
     Eigen::Vector3d C_p_Gps;
+
+    Eigen::Matrix3d C_R_I;
+    Eigen::Vector3d C_p_I;
 };
 
 struct SysConfig {
