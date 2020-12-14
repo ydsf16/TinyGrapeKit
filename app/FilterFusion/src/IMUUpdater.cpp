@@ -109,7 +109,7 @@ bool EvaluateOneJacobian(basalt::So3Spline<4, double>& so3_spline,
     Eigen::Matrix<double, 6, 9> Ht;
     Ht.setZero();
     Ht.block<3, 3>(0, 3) = Eigen::Matrix3d::Identity();
-    Ht.block<3, 3>(3, 0) = TGK::Util::Skew(I_a_I);
+    Ht.block<3, 3>(3, 0) = G_R_I.transpose() * TGK::Util::Skew(G_a_I + kGravity);
     Ht.block<3, 3>(3, 6) = G_R_I.transpose();
 
     Eigen::Matrix<double, 9, 24> Hs;
@@ -130,6 +130,17 @@ bool EvaluateOneJacobian(basalt::So3Spline<4, double>& so3_spline,
     Hs.block<3, 3>(6, 21) = rd_acc_Jacobian.d_val_d_knot[3] * Eigen::Matrix3d::Identity();
 
     *J_wrt_knots = Ht * Hs;
+
+    // Convert Left Jacobian to Right Jacobain.
+    J_wrt_knots->block<3, 3>(0, 0) = J_wrt_knots->block<3, 3>(0, 0).eval() * so3_spline.getKnot(0).matrix();
+    J_wrt_knots->block<3, 3>(0, 6) = J_wrt_knots->block<3, 3>(0, 6).eval() * so3_spline.getKnot(1).matrix();
+    J_wrt_knots->block<3, 3>(0, 12) = J_wrt_knots->block<3, 3>(0, 12).eval() * so3_spline.getKnot(2).matrix();
+    J_wrt_knots->block<3, 3>(0, 18) = J_wrt_knots->block<3, 3>(0, 18).eval() * so3_spline.getKnot(3).matrix();
+    
+    J_wrt_knots->block<3, 3>(3, 0) = J_wrt_knots->block<3, 3>(3, 0).eval() * so3_spline.getKnot(0).matrix();
+    J_wrt_knots->block<3, 3>(3, 6) = J_wrt_knots->block<3, 3>(3, 6).eval() * so3_spline.getKnot(1).matrix();
+    J_wrt_knots->block<3, 3>(3, 12) = J_wrt_knots->block<3, 3>(3, 12).eval() * so3_spline.getKnot(2).matrix();
+    J_wrt_knots->block<3, 3>(3, 18) = J_wrt_knots->block<3, 3>(3, 18).eval() * so3_spline.getKnot(3).matrix();
 
     return true;
 }
