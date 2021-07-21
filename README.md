@@ -44,4 +44,4 @@ For examples, please refer to the **Example** folder.
 # Contact us
 For any issues, please feel free to contact **[Dongsheng Yang](https://github.com/ydsf16)**: <ydsf16@buaa.edu.cn>, <ydsf16@163.com>
 
-# Just for Grape.
+# Just for JYYJ.
