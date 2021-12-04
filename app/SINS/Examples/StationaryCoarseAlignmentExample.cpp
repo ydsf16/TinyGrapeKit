@@ -22,8 +22,8 @@ int main(int argc, char **argv) {
     const Eigen::Vector3d euler_nb = RotMatToEuler(C_nb); 
 
     constexpr double kRadToDeg = 180. / M_PI;    
-    std::cout << "C_nb:\n" << std::fixed << C_nb << std::endl << std::endl;
-    std::cout << "euler_nb: " << std::fixed << euler_nb.transpose() * kRadToDeg << std::endl;
+    std::cout << "C_nb:\n" << std::fixed << C_nb << std::endl << std::endl << std::endl;
+    std::cout << "euler_nb: " << std::fixed << euler_nb.transpose() * kRadToDeg << std::endl << std::endl;
 
     double latitude = SINS::ComputeLatitude(acc, gyro);
     std::cout << "Latitude: " << std::fixed << latitude * kRadToDeg << std::endl;
