@@ -31,3 +31,8 @@ add_executable(CombineData
     Tools/CombineData.cpp)
 target_link_libraries(CombineData
     ${PROJECT_NAME}_Core)
+
+add_executable(InsUpdateExample 
+    Examples/InsUpdateExample.cpp)
+target_link_libraries(InsUpdateExample
+    ${PROJECT_NAME}_Core)

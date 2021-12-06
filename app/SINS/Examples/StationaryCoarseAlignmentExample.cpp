@@ -1,13 +1,9 @@
 #include "Alignment/StationaryCoarseAlignment.h"
+#include "Utils/SO3.h"
 
 #include <iostream>
 
-Eigen::Vector3d RotMatToEuler(const Eigen::Matrix3d &C) {
-    double roll = std::atan2(C(2, 1), C(2, 2));
-    double pitch = std::atan2(-C(2, 0), sqrt(C(2, 1)* C(2, 1) + C(2, 2) * C(2, 2)));
-    double yaw = std::atan2(C(1, 0), C(0, 0));
-    return Eigen::Vector3d(yaw, pitch, roll);
-}
+using namespace SINS;
 
 int main(int argc, char **argv) {
     // Start.
