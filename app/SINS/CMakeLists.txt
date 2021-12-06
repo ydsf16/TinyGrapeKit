@@ -12,11 +12,12 @@ include_directories(${GLOG_INCLUDE_DIR})
 
 # Make core library
 file(GLOB_RECURSE ALL_HEADER_FILES
-    ${PROJECT_SOURCE_DIR}/core/*/*.h
+    ${PROJECT_SOURCE_DIR}/Core/*/*.h
 )
 file(GLOB_RECURSE ALL_SRC_FILES
-    ${PROJECT_SOURCE_DIR}/core/*/*.cpp
+    ${PROJECT_SOURCE_DIR}/Core/*/*.cpp
 )
+
 #include_directories(${PROJECT_SOURCE_DIR}/core/*/)
 add_library(${PROJECT_NAME}_Core SHARED ${ALL_SRC_FILES} ${ALL_HEADER_FILES})
 

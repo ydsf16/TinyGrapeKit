@@ -12,11 +12,6 @@ void EarthModel::GetRmRn(double latitude, double *Rm, double *Rn) {
 
     *Rm = param_.Re * (1.0 - param_.f) * (1.0 - param_.f) / (one_minus * sqrt_one_minus);
     *Rn = param_.Re / sqrt_one_minus;
-
-    // double sin_lat = std::sin(latitude);
-    // double one_minus = 1.0 - param_.e2 * sin_lat * sin_lat;
-    // *Rn = param_.Re / std::sqrt(one_minus);
-    // *Rm = *Rn * (1.0 - param_.e2) / one_minus;
 }
 
 Eigen::Vector3d EarthModel::GetGravity(double latitude, double height) {
@@ -29,11 +24,19 @@ Eigen::Vector3d EarthModel::GetGravity(double latitude, double height) {
     constexpr double kBeta3 = 8.08e-9;
    // return Eigen::Vector3d(0.0, -kBeta3 * height * sin_2lat, -g);
 
-    return Eigen::Vector3d(0.0, 0.0, -9.80537484095091);
+    return Eigen::Vector3d(0.0, 0.0, -g0);
 }
 
 Eigen::Vector3d EarthModel::GetWie(double latitude) {
     return Eigen::Vector3d(0.0, param_.wie * std::cos(latitude), param_.wie * std::sin(latitude));
+}
+
+Eigen::Vector3d EarthModel::GetWen(double east_vel, double north_vel, double latitude, double height, double Rm, double Rn) {
+    return Eigen::Vector3d(
+        -north_vel / (Rm + height),
+        east_vel / (Rn + height),
+        north_vel * std::tan(latitude) / (Rn + height)
+    );
 }
 
 }  // namespace SINS

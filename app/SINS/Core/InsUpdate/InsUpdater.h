@@ -20,12 +20,16 @@ public:
 
     static bool UpdateInsState(const ImuData::ConstPtr begin_imu, const ImuData::ConstPtr end_imu, InsState *ins_state);
 
+    static void UpdateEarthParams(InsState *ins_state);
+
+    static void UpdateEarthParams(double latitude, double height, double east_vel, double north_vel, InsState *ins_state);
+
 private:
     /********** Internal used functions. ************/
     static Eigen::Vector3d GetWen(double v_E, double v_N, double latitude, double height, double Rm, double Rn);
     static Eigen::Vector3d GetWen(const InsState &ins_state);
 
-    static void UpdateEarthParams(InsState *ins_state);
+    
 
     /*** Single Update ***/
     static bool UpdateOrientation(double delta_t,

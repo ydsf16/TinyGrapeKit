@@ -8,12 +8,18 @@ namespace SINS {
 
 inline Eigen::Matrix3d SO3Exp(const Eigen::Vector3d &v) {
     double theta = v.norm();
-    if (theta < 1e-10) {
+    if (theta < 1e-14) {
         return Eigen::Matrix3d::Identity() + SkewMat(v);
     }
 
     return Eigen::AngleAxisd(theta, v.normalized()).toRotationMatrix();
 } 
+
+inline Eigen::Matrix3d NormalizeRotMat(const Eigen::Matrix3d &rot) {
+    Eigen::Quaterniond quat(rot);
+    quat.normalize();
+    return quat.toRotationMatrix();
+}
 
 Eigen::Vector3d RotMatToEuler(const Eigen::Matrix3d &C) {
     double roll = std::atan2(C(2, 1), C(2, 2));

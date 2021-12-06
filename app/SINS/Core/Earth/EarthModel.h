@@ -32,6 +32,7 @@ public:
     void GetRmRn(double latitude, double *Rm, double *Rn);
     Eigen::Vector3d GetGravity(double latitude, double hight = 0);
     Eigen::Vector3d GetWie(double latitude);
+    static Eigen::Vector3d GetWen(double east_vel, double north_vel, double latitude, double height, double Rm, double Rn);
 
 private:
     EarthParam param_;

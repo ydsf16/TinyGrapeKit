@@ -17,9 +17,13 @@ struct InsState {
     Eigen::Vector3d acc_bias;
 
     // Earth params.
-    Eigen::Vector3d gravity;
+    bool update_earth = false;
+    Eigen::Vector3d gravity = Eigen::Vector3d(0.0, 0.0, -9.8);
     double Rm;
     double Rn;
+    Eigen::Vector3d wie; 
+    Eigen::Vector3d wen; 
+    Eigen::Vector3d win; 
 };
 
 }  // namespace SINS

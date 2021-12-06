@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 #include "InsUpdate/InsUpdater.h"
 #include "Alignment/StationaryCoarseAlignment.h"
@@ -66,7 +67,7 @@ int main(int argc, char **argv) {
     auto imu_vec = ParseImuFile(imu_path);
     std::cout << "Imu size: " << imu_vec.size() << std::endl;
 
-    // Initialization.
+    // 1. Initialization.
     size_t number_init_imus = 25000;
     Eigen::Vector3d mean_acc = Eigen::Vector3d::Zero();
     Eigen::Vector3d mean_gyro = Eigen::Vector3d::Zero();
@@ -80,23 +81,24 @@ int main(int argc, char **argv) {
 
     Eigen::Matrix3d C_nb = SINS::StationaryCoarseAlign(mean_acc, mean_gyro); // 
 
+    size_t kFirstIdx = 70000;
     InsState ins_state;
-    ins_state.time = imu_vec[0]->time;
+    ins_state.time = imu_vec[kFirstIdx]->time;
     ins_state.lon_lat_hei << 116.252733994444 * kDegToRad, 40.091633386111 * kDegToRad, 0.0;
     ins_state.velocity.setZero();
     ins_state.orientation = C_nb;
     ins_state.acc_bias.setZero();
     ins_state.gyro_bias.setZero();
 
-    std::ofstream save_file(res_save_path, std::ios::out);
-
-    //-0.664600000000,1.145200000000,
-    Eigen::Matrix3d C_nb_fix = ( Eigen::AngleAxisd(116.4222 * kDegToRad, Eigen::Vector3d::UnitZ()) *
-                               Eigen::AngleAxisd(1.1452 * kDegToRad, Eigen::Vector3d::UnitY()) *
-                               Eigen::AngleAxisd(-0.6646 * kDegToRad, Eigen::Vector3d::UnitX()) ).toRotationMatrix();
+    Eigen::Matrix3d C_nb_fix = ( Eigen::AngleAxisd(116.2591 * kDegToRad, Eigen::Vector3d::UnitZ()) *
+                                 Eigen::AngleAxisd(1.1720 * kDegToRad, Eigen::Vector3d::UnitY()) *
+                                 Eigen::AngleAxisd(-0.6693 * kDegToRad, Eigen::Vector3d::UnitX()) ).toRotationMatrix();
     ins_state.orientation = C_nb_fix;
+    InsUpdater::UpdateEarthParams(&ins_state);
     
-    for (size_t i = 1; i < imu_vec.size(); ++i) {
+    // 2. Update.
+    std::ofstream save_file(res_save_path, std::ios::out);
+    for (size_t i = kFirstIdx+1; i < imu_vec.size(); ++i) {
         InsUpdater::UpdateInsState(imu_vec[i-1], imu_vec[i], &ins_state);
 
         Eigen::Vector3d yaw_pitch_roll = RotMatToEuler(ins_state.orientation) * kRadToDeg;
