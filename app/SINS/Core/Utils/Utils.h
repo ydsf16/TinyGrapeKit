@@ -4,6 +4,9 @@
 
 namespace SINS {
 
+constexpr double kDegToRad = M_PI / 180.0;
+constexpr double kRadToDeg = 180.0 / M_PI;
+
 inline Eigen::Matrix3d SkewMat(const Eigen::Vector3d &v) {
     Eigen::Matrix3d skew_mat;
 

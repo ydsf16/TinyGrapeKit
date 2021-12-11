@@ -31,11 +31,17 @@ struct ImuData : public SensorData {
     using Ptr = std::shared_ptr<ImuData>;
     using ConstPtr = std::shared_ptr<const ImuData>;
 
-    ImuData() : SensorData(-1.0, SensorType::kIMU, "") { }
+    enum Mode {
+        kRate,
+        kIncreasement,
+    };
+
+    ImuData() : SensorData(-1.0, SensorType::kIMU, ""), mode(Mode::kIncreasement) { }
     ~ImuData() override { }
 
-    Eigen::Vector3d acc;   // m/s^2.
-    Eigen::Vector3d gyro;  // rad/s
+    Mode mode;
+    Eigen::Vector3d acc;   // acclearation [m/s^2] or velocity increasement [m/s]
+    Eigen::Vector3d gyro;  // angular rate [rad/s] or angle increasement [rad]
 };
 
 struct WheelData : public SensorData {

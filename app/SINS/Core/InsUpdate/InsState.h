@@ -8,9 +8,9 @@ struct InsState {
     double time;  // [s]
 
     // PVA.
-    Eigen::Vector3d lon_lat_hei; // [rad, rad, m] 
-    Eigen::Vector3d velocity;    // v_nb
-    Eigen::Matrix3d orientation; // C_nb.
+    Eigen::Vector3d lon_lat_hei;     // [rad, rad, m] 
+    Eigen::Vector3d velocity;        // v_nb
+    Eigen::Quaterniond orientation;  // q_nb
 
     // IMU params.
     Eigen::Vector3d gyro_bias;

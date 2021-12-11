@@ -14,14 +14,9 @@ bool InsUpdater::UpdateInsState(double delta_t,
         UpdateEarthParams(ins_state);
     } 
 
-    // Copy last state.
-    InsState last_ins_state = *ins_state;
-
     bool res_vel = UpdateVelocity(delta_t, delta_theta1, delta_theta2, delta_v1, delta_v2, ins_state);
     bool res_ori = UpdateOrientation(delta_t, delta_theta1, delta_theta2, ins_state);
-    bool res_pos = UpdatePosition(delta_t, last_ins_state.velocity, ins_state);
-
-    // std::cin.ignore();
+    // bool res_pos = UpdatePosition(delta_t, last_ins_state.velocity, ins_state);
 
     return true;
 }
@@ -64,14 +59,22 @@ void InsUpdater::UpdateEarthParams(double latitude, double height, double east_v
 bool InsUpdater::UpdateOrientation(double delta_t,
                                    const Eigen::Vector3d &delta_theta1, const Eigen::Vector3d &delta_theta2,
                                    InsState *ins_state) {
-    const Eigen::Vector3d phi_nn = -ins_state->win * delta_t;
-    Eigen::Matrix3d C_nn = SO3Exp(phi_nn);
+    // Check input.
+    if (delta_t < 0.0 || ins_state == nullptr) { return false; }
 
-    const Eigen::Vector3d phi_bb = delta_theta1 + delta_theta2 + (2.0/3.0) * delta_theta1.cross(delta_theta2);
-    const Eigen::Matrix3d C_bb = SO3Exp(phi_bb);
+    // Rotation of the navigation frame.
+    // const Eigen::Vector3d phi_nn = -ins_state->win * delta_t;
 
-    ins_state->orientation = C_nn * ins_state->orientation.eval() * C_bb;
-    ins_state->orientation = NormalizeRotMat(ins_state->orientation);
+    const Eigen::Vector3d phi_nn = -ins_state->wie * delta_t;
+    Eigen::Quaterniond q_nn = QuatExp(phi_nn);
+
+    // Rotation of the body.
+    const Eigen::Vector3d phi_bb = delta_theta1 + delta_theta2 + (2.0 / 3.0) * delta_theta1.cross(delta_theta2);
+    const Eigen::Quaterniond q_bb = QuatExp(phi_bb);
+
+    // Put togather.
+    ins_state->orientation = q_nn * ins_state->orientation * q_bb;
+    ins_state->orientation.normalize();
 
     return true;
 }
@@ -80,22 +83,18 @@ bool InsUpdater::UpdateVelocity(double delta_t,
                                 const Eigen::Vector3d &delta_theta1, const Eigen::Vector3d &delta_theta2, 
                                 const Eigen::Vector3d &delta_v1, const Eigen::Vector3d &delta_v2,
                                 InsState *ins_state) {
-    const Eigen::Vector3d delta_theta = delta_theta1 + delta_theta2;
+    // const Eigen::Vector3d delta_theta = delta_theta1 + delta_theta2;
     const Eigen::Vector3d delta_v = delta_v1 + delta_v2;
-    const Eigen::Vector3d delta_v_rot = 0.5 * delta_theta.cross(delta_v);
-
-    // Scul
-    const Eigen::Vector3d delta_v_scul = ( 2.0 / 3.0) * (delta_theta1.cross(delta_v2) + delta_v1.cross(delta_theta2));
-
-    // Vsf.
-    const Eigen::Vector3d delta_v_sf = ins_state->orientation * (delta_v + delta_v_rot + delta_v_scul);
-    
-    const Eigen::Vector3d delta_v_corgm = 
-         (-(2.0 * ins_state->wie + ins_state->wen).cross(ins_state->velocity) + ins_state->gravity) * delta_t;
-    
+    // const Eigen::Vector3d delta_v_rot = 0.5 * delta_theta.cross(delta_v);
+    // // Scul
+    // const Eigen::Vector3d delta_v_scul = (2.0 / 3.0) * (delta_theta1.cross(delta_v2) + delta_v1.cross(delta_theta2));
+    // // Vsf.
+    // const Eigen::Vector3d delta_v_sf = ins_state->orientation * (delta_v + delta_v_rot + delta_v_scul);
+    // const Eigen::Vector3d delta_v_corgm = 
+    //      (-(2.0 * ins_state->wie + ins_state->wen).cross(ins_state->velocity) + ins_state->gravity) * delta_t;
     // ins_state->velocity = ins_state->velocity.eval() + delta_v_corgm + delta_v_sf;
 
-    ins_state->velocity = ins_state->velocity + Eigen::Quaterniond(ins_state->orientation) * delta_v + ins_state->gravity * delta_t;
+    ins_state->velocity = ins_state->velocity + ins_state->orientation * delta_v + ins_state->gravity * delta_t;
 
     return true;
 }

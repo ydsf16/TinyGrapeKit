@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include <Eigen/Eigen>
 
 #include "Utils.h"
@@ -21,11 +23,38 @@ inline Eigen::Matrix3d NormalizeRotMat(const Eigen::Matrix3d &rot) {
     return quat.toRotationMatrix();
 }
 
-Eigen::Vector3d RotMatToEuler(const Eigen::Matrix3d &C) {
-    double roll = std::atan2(C(2, 1), C(2, 2));
-    double pitch = std::atan2(-C(2, 0), sqrt(C(2, 1)* C(2, 1) + C(2, 2) * C(2, 2)));
-    double yaw = std::atan2(C(1, 0), C(0, 0));
-    return Eigen::Vector3d(yaw, pitch, roll);
+inline Eigen::Quaterniond QuatExp(const Eigen::Vector3d &v) {
+    const double half_theta = 0.5 * v.norm();
+    if (half_theta < 1e-14) {
+        const Eigen::Vector3d im_part = 0.5 * v;
+        return Eigen::Quaterniond(1.0, im_part.x(), im_part.y(), im_part.z()).normalized(); 
+    }
+
+    const Eigen::Vector3d im_part = v.normalized() * std::sin(half_theta);
+    return Eigen::Quaterniond(std::cos(half_theta), im_part.x(), im_part.y(), im_part.z()).normalized();
+}
+
+inline Eigen::Vector3d MatToAtt(const Eigen::Matrix3d &rot_mat) {
+    return Eigen::Vector3d(
+        std::asin(rot_mat(2, 1)), 
+        std::atan2(-rot_mat(2, 0), rot_mat(2, 2)), 
+        std::atan2(-rot_mat(0, 1), rot_mat(1, 1)));
+}
+
+inline Eigen::Matrix3d AttToMat(const Eigen::Vector3d &att) {
+    Eigen::Matrix3d rot;
+    rot = Eigen::AngleAxisd(att.z(), Eigen::Vector3d::UnitZ()) *
+          Eigen::AngleAxisd(att.x(), Eigen::Vector3d::UnitX()) *
+          Eigen::AngleAxisd(att.y(), Eigen::Vector3d::UnitY());
+    return rot;
+}
+
+inline Eigen::Quaterniond AttToQuat(const Eigen::Vector3d &att) {
+    return Eigen::Quaterniond(AttToMat(att));
+}
+
+inline Eigen::Vector3d QuatToAtt(const Eigen::Quaterniond &quat) {
+    return MatToAtt(quat.toRotationMatrix());
 }
 
 } // namespace SINS
