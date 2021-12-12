@@ -94,7 +94,7 @@ bool InsUpdater::UpdateVelocity(double delta_t,
     //      (-(2.0 * ins_state->wie + ins_state->wen).cross(ins_state->velocity) + ins_state->gravity) * delta_t;
     // ins_state->velocity = ins_state->velocity.eval() + delta_v_corgm + delta_v_sf;
 
-    ins_state->velocity = ins_state->velocity + ins_state->orientation * delta_v + ins_state->gravity * delta_t;
+    ins_state->velocity = ins_state->velocity + ins_state->orientation * delta_v;//  + ins_state->gravity * delta_t;
 
     return true;
 }

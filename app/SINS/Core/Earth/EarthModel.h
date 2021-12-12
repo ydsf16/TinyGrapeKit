@@ -11,8 +11,11 @@ public:
     struct EarthParam {
         // Default: WGS84.
         double f = 1.0 / 298.257223563; // 扁率.
-        double Re = 6378137;            // 长半轴
+        double Re = 6378137;            // 半长轴
         double wie = 7.2921151467e-5;   // Earth rotation rate [rad/s]
+        double e2 = f * (2.0 - f);
+        double e = std::sqrt(e2);
+        double g0 = 9.7803267714; 
     };
 
 public:
