@@ -14,4 +14,6 @@ public:
     static Eigen::Matrix<double, kKFStateDim, 6> ComputeGMatrix(const InsState &ins_state);
 };
 
+Eigen::Matrix3d ComputeMpv(double Rmh, double Rnh, double latitude);
+
 } // namespace SINS

@@ -7,13 +7,13 @@ namespace SINS {
 struct InsState {
     double time;  // [s]
 
-    // PVA.
-    Eigen::Vector3d lat_lon_hei;     // [rad, rad, m] 
-    Eigen::Vector3d velocity;        // v_nb
+    // AVP
     Eigen::Quaterniond orientation;  // q_nb
+    Eigen::Vector3d velocity;        // v_nb
+    Eigen::Vector3d lat_lon_hei;     // [rad, rad, m] 
 
-    // IMU params.
-    Eigen::Vector3d gyro_bias;
+    // IMU bias.
+    Eigen::Vector3d gyro_bias;   
     Eigen::Vector3d acc_bias;
 
     // IMU Reading.
@@ -28,6 +28,9 @@ struct InsState {
     Eigen::Vector3d Wnie; 
     Eigen::Vector3d Wnen; 
     Eigen::Vector3d Wnin; 
+
+    // Mid use
+    Eigen::Matrix3d Mpv;
 };
 
 }  // namespace SINS
