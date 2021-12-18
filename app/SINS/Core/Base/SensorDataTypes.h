@@ -61,10 +61,10 @@ struct GnssData : public SensorData {
     GnssData() : SensorData(-1.0, SensorType::kGNSS, "") { }
 
     int pos_type;
-    Eigen::Vector3d lon_lat_hei;
+    Eigen::Vector3d lat_lon_hei;
     Eigen::Vector3d velocity;
 
-    Eigen::Vector3d lon_lat_hei_std;
+    Eigen::Vector3d lat_lon_hei_std;
     Eigen::Vector3d velocity_std;
 };
 

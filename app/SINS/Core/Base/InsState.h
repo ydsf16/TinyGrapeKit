@@ -8,7 +8,7 @@ struct InsState {
     double time;  // [s]
 
     // PVA.
-    Eigen::Vector3d lon_lat_hei;     // [rad, rad, m] 
+    Eigen::Vector3d lat_lon_hei;     // [rad, rad, m] 
     Eigen::Vector3d velocity;        // v_nb
     Eigen::Quaterniond orientation;  // q_nb
 
@@ -16,14 +16,18 @@ struct InsState {
     Eigen::Vector3d gyro_bias;
     Eigen::Vector3d acc_bias;
 
+    // IMU Reading.
+    Eigen::Vector3d acc;  // [m/s^2]
+    Eigen::Vector3d gyro; // [rad / s]
+
     // Earth params.
     bool update_earth = false;
     Eigen::Vector3d gravity = Eigen::Vector3d(0.0, 0.0, -9.8);
     double Rm;
     double Rn;
-    Eigen::Vector3d wie; 
-    Eigen::Vector3d wen; 
-    Eigen::Vector3d win; 
+    Eigen::Vector3d Wnie; 
+    Eigen::Vector3d Wnen; 
+    Eigen::Vector3d Wnin; 
 };
 
 }  // namespace SINS

@@ -38,6 +38,10 @@ Eigen::Vector3d EarthModel::GetWie(double latitude) {
     return Eigen::Vector3d(0.0, param_.wie * std::cos(latitude), param_.wie * std::sin(latitude));
 }
 
+double EarthModel::Getwie() {
+    return param_.wie;
+}
+
 Eigen::Vector3d EarthModel::GetWen(double east_vel, double north_vel, double latitude, double height, double Rm, double Rn) {
     return Eigen::Vector3d(
         -north_vel / (Rm + height),

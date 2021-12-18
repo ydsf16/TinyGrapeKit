@@ -17,4 +17,8 @@ inline Eigen::Matrix3d SkewMat(const Eigen::Vector3d &v) {
     return skew_mat;
 }
 
+inline double sec(double theta) {
+    return 1. / std::cos(theta);
+}
+
 }  // namespace SINS

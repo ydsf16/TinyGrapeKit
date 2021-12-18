@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
     size_t kFirstIdx = 70000;
     InsState ins_state;
     ins_state.time = imu_vec[kFirstIdx]->time;
-    ins_state.lon_lat_hei << 116.252733994444 * kDegToRad, 40.091633386111 * kDegToRad, 34.789968044678390;
+    ins_state.lat_lon_hei << 40.091633386111 * kDegToRad, 116.252733994444 * kDegToRad,  34.789968044678390;
     ins_state.velocity.setZero();
     ins_state.orientation = AttToMat(Eigen::Vector3d(-0.0116099301842663, 0.0201917141163224, 2.03181108607518)); 
     ins_state.acc_bias.setZero();
@@ -99,9 +99,9 @@ int main(int argc, char **argv) {
             << ins_state.velocity.x() << ", " 
             << ins_state.velocity.y() << ", " 
             << ins_state.velocity.z() << ", "
-            << ins_state.lon_lat_hei.y() << ", " 
-            << ins_state.lon_lat_hei.x() << ", " 
-            << ins_state.lon_lat_hei.z() << ", "
+            << ins_state.lat_lon_hei.x() << ", " 
+            << ins_state.lat_lon_hei.y() << ", " 
+            << ins_state.lat_lon_hei.z() << ", "
             << std::to_string(ins_state.time) << std::endl; 
     }
 
