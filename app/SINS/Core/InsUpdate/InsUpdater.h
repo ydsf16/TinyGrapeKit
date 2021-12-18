@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Earth/EarthModel.h"
-#include "InsState.h"
-#include "Base/SensorDataTypes.h"
+#include "Base/InsState.h"
 
 namespace SINS {
 
@@ -14,12 +13,6 @@ public:
                                const Eigen::Vector3d &delta_v1, const Eigen::Vector3d &delta_v2,
                                InsState *ins_state,
                                bool fix_height = false);
-
-    static void UpdateInsState(double begin_time, const Eigen::Vector3d &begin_acc, const Eigen::Vector3d &begin_gyro,
-                               double end_time, const Eigen::Vector3d &end_acc, const Eigen::Vector3d &end_gyro,
-                               InsState *ins_state);
-
-    static void UpdateInsState(const ImuData::ConstPtr begin_imu, const ImuData::ConstPtr end_imu, InsState *ins_state);
 
     static void UpdateEarthParams(InsState *ins_state);
 

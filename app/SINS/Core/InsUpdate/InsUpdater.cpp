@@ -18,33 +18,22 @@ void InsUpdater::UpdateInsState(double delta_t,
     const Eigen::Vector3d last_vel = ins_state->velocity;
     const double last_hei = ins_state->lat_lon_hei[2];
 
-    UpdateVelocity(delta_t, delta_theta1, delta_theta2, delta_v1, delta_v2, ins_state);
-    UpdateOrientation(delta_t, delta_theta1, delta_theta2, ins_state);
+    // Unbias.
+    const Eigen::Vector3d &ub_delta_theta1 = delta_theta1 - ins_state->gyro_bias * delta_t * 0.5;
+    const Eigen::Vector3d &ub_delta_theta2 = delta_theta2 - ins_state->gyro_bias * delta_t * 0.5;
+    const Eigen::Vector3d &ub_delta_v1 = delta_v1 - ins_state->acc_bias * delta_t * 0.5;
+    const Eigen::Vector3d &ub_delta_v2 = delta_v2 - ins_state->acc_bias * delta_t * 0.5;
+
+    UpdateVelocity(delta_t, ub_delta_theta1, ub_delta_theta2, ub_delta_v1, ub_delta_v2, ins_state);
+    UpdateOrientation(delta_t, ub_delta_theta1, ub_delta_theta2, ins_state);
     UpdatePosition(delta_t, last_vel, ins_state);
 
     // Fix height.
     if (fix_height) { ins_state->lat_lon_hei[2] = last_hei; }
-}
 
-void InsUpdater::UpdateInsState(double begin_time, const Eigen::Vector3d &begin_acc, const Eigen::Vector3d &begin_gyro,
-                                double end_time, const Eigen::Vector3d &end_acc, const Eigen::Vector3d &end_gyro,
-                                InsState *ins_state) {
-    double delta_t = end_time - begin_time;
-    const Eigen::Vector3d mid_acc = begin_acc + (end_acc - begin_acc) * 0.5;
-    const Eigen::Vector3d mid_gyro = begin_gyro + (end_gyro - begin_gyro) * 0.5;
-    const Eigen::Vector3d delta_theta1 = 0.25 * delta_t * (begin_gyro + mid_gyro);
-    const Eigen::Vector3d delta_theta2 = 0.25 * delta_t * (mid_gyro + end_gyro);
-    const Eigen::Vector3d delta_v1 = 0.25 * delta_t * (begin_acc + mid_acc);
-    const Eigen::Vector3d delta_v2 = 0.25 * delta_t * (mid_acc + end_acc);
-
-    ins_state->time = end_time;
-    UpdateInsState(delta_t, delta_theta1, delta_theta2, delta_v1, delta_v2, ins_state);                     
-}
-
-void InsUpdater::UpdateInsState(const ImuData::ConstPtr begin_imu, const ImuData::ConstPtr end_imu, InsState *ins_state) {
-    UpdateInsState(begin_imu->time, begin_imu->acc - ins_state->acc_bias, begin_imu->gyro - ins_state->gyro_bias, 
-                   end_imu->time, end_imu->acc - ins_state->acc_bias, end_imu->gyro - ins_state->gyro_bias,
-                   ins_state);
+    // Compute unbiased imu data.
+    ins_state->ub_acc = 0.5 * delta_v2 / delta_t - ins_state->acc_bias;
+    ins_state->ub_gyro = 0.5 * delta_theta2 / delta_t - ins_state->gyro_bias;
 }
 
 void InsUpdater::UpdateEarthParams(InsState *ins_state) {

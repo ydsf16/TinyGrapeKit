@@ -5,6 +5,7 @@
 #include "InsUpdate/InsUpdater.h"
 #include "Alignment/StationaryCoarseAlignment.h"
 #include "Utils/SO3.h"
+#include "Base/SensorDataTypes.h"
 
 using namespace SINS;
 

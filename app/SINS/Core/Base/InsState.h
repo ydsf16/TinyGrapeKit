@@ -17,8 +17,8 @@ struct InsState {
     Eigen::Vector3d acc_bias;
 
     // IMU Reading.
-    Eigen::Vector3d acc;  // [m/s^2]
-    Eigen::Vector3d gyro; // [rad / s]
+    Eigen::Vector3d ub_acc;  // [m/s^2]
+    Eigen::Vector3d ub_gyro; // [rad / s]
 
     // Earth params.
     bool update_earth = false;
