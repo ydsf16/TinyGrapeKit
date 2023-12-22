@@ -12,6 +12,9 @@ Hello，小伙伴们！
 
 ![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/20231223-004022.jpeg)
 
+<img src="https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/20231223-004022.jpeg" width="210px">
+
+
 # TinyGrapeKit
 ## A bunch of state estimation algorithms.
 This repo is divided into two parts, one is the basic algorithm, in the **library** folder. The other is the actual multi-sensor fusion algorithm (e.g. SLAM), in the **app** folder.
