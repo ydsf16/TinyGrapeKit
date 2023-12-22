@@ -1,3 +1,6 @@
+# 招聘啦！！！
+我目前在蔚来汽车自动驾驶部门工作，目前组内有一些正式和实习生工作机会，感兴趣的欢迎来聊。**微信** YDSF16 **Email** ydsf16@163.com
+
 # TinyGrapeKit
 ## A bunch of state estimation algorithms.
 This repo is divided into two parts, one is the basic algorithm, in the **library** folder. The other is the actual multi-sensor fusion algorithm (e.g. SLAM), in the **app** folder.
