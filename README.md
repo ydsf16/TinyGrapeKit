@@ -10,6 +10,7 @@ Hello，小伙伴们！
 
 **现在，我们组正在寻找计算机视觉、Learning、SLAM、多传感器融合等技术背景的同学加入，全职和实习均可以，欢迎来聊。Email: ydsf16@163.com, 微信: YDSF16**
 
+![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/NIO-JD.jpeg)
 
 
 # TinyGrapeKit
