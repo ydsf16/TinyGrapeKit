@@ -12,6 +12,9 @@ Hello，小伙伴们！
 
 ![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/NIO-JD.jpeg)
 
+<a href="https://youtu.be/3A5wpWgrHTI" target="_blank"><img src="https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/20231223-004022.jpeg" 
+alt="DRE-SLAM" width="320" height="240"/></a>
+
 
 # TinyGrapeKit
 ## A bunch of state estimation algorithms.
