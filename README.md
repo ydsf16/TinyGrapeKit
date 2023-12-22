@@ -8,7 +8,7 @@ Hello，小伙伴们！
 
 **[全域领航辅助｜超3倍完成年度目标，提速规划节奏](app.nio.com/app/community_content_h5/module_10050/content?id=531584&type=article&is_nav_show=false&wv=lg)**
 
-**现在，我们组正在寻找计算机视觉、Learning、SLAM、多传感器融合等技术背景的同学加入，全职和实习均可以，欢迎来聊。微信: YDSF16**
+**现在，我们组正在寻找计算机视觉、深度学习、SLAM、多传感器融合、组合惯导等技术背景的同学加入，全职和实习均可以，欢迎来聊。微信: YDSF16**
 
 <a href="https://youtu.be/3A5wpWgrHTI" target="_blank"><img src="https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/20231223-004022.jpeg" 
 alt="DRE-SLAM" width="300" height="300"/></a>
