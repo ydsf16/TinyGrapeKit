@@ -8,12 +8,15 @@ Hello，小伙伴们！
 
 **[全域领航辅助｜超3倍完成年度目标，提速规划节奏](app.nio.com/app/community_content_h5/module_10050/content?id=531584&type=article&is_nav_show=false&wv=lg)**
 
-**现在，我们组正在寻找计算机视觉、Learning、SLAM、多传感器融合等技术背景的同学加入，全职和实习均可以，欢迎来聊。Email: ydsf16@163.com, 微信: YDSF16**
-
-![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/NIO-JD.jpeg)
+**现在，我们组正在寻找计算机视觉、Learning、SLAM、多传感器融合等技术背景的同学加入，全职和实习均可以，欢迎来聊。微信: YDSF16**
 
 <a href="https://youtu.be/3A5wpWgrHTI" target="_blank"><img src="https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/20231223-004022.jpeg" 
-alt="DRE-SLAM" width="320" height="240"/></a>
+alt="DRE-SLAM" width="300" height="300"/></a>
+
+NIO社招内推码: B89PQMZ 
+投递链接: https://nio.jobs.feishu.cn/referral/m/position/detail/?token=MTsxNzAzMjY0NzE2NTYyOzY5ODI0NTE1OTI5OTgxOTI2NDg7NzI2MDc4NjA0ODI2Mjk2NTU0MQ
+
+![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/NIO-JD.jpeg)
 
 
 # TinyGrapeKit
@@ -61,6 +64,4 @@ For examples, please refer to the **Example** folder.
 
 # Contact us
 For any issues, please feel free to contact **[Dongsheng Yang](https://github.com/ydsf16)**: <ydsf16@buaa.edu.cn>, <ydsf16@163.com>
-
-# Just for JYYJ - w.
 
