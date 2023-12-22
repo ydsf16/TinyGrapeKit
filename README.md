@@ -10,9 +10,9 @@ Hello，小伙伴们！
 
 **现在，我们组正在寻找计算机视觉、Learning、SLAM、多传感器融合等技术背景的同学加入，全职和实习均可以，欢迎来聊。Email: ydsf16@163.com, 微信: YDSF16**
 
-![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/20231223-004022.jpeg){:width="100px" height="100px"}
+![image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/20231223-004022.jpeg)
 
-![Image Description](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/20231223-004022.jpeg){:width="300px" height="200px"}
+<img src="[url_to_your_image](https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/20231223-004022.jpeg)" alt="Image Description" style="width:300px; height:200px;">
 
 
 
