@@ -8,7 +8,7 @@
 
 如果你对计算机视觉、深度学习、SLAM、多传感器融合、组合惯导等技术有着扎实的背景，不论是全职还是实习，我们都欢迎你加入我们的团队。有兴趣的话，可以通过微信联系我们：**YDSF16**。期待与你共同探索智能驾驶领域的未来！
 
-[全域领航辅助｜超3倍完成年度目标，提速规划节奏](app.nio.com/app/community_content_h5/module_10050/content?id=531584&type=article&is_nav_show=false&wv=lg)
+[全域领航辅助｜超3倍完成年度目标，提速规划节奏](https://app.nio.com/app/community_content_h5/module_10050/content?id=531584&type=article&is_nav_show=false&wv=lg)
 
 <a href="https://youtu.be/3A5wpWgrHTI" target="_blank"><img src="https://github.com/ydsf16/TinyGrapeKit/blob/master/app/FilterFusion/doc/20231223-004022.jpeg" 
 alt="YDS" width="300" height="300"/></a>
